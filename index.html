@@ -10,6 +10,10 @@
 <link rel="stylesheet" href="src/styles/layout.css" />
 <link rel="stylesheet" href="src/styles/sections.css" />
 <link rel="stylesheet" href="src/styles/effects.css" />
+<link rel="stylesheet" href="src/styles/cards.css" />
+<link rel="stylesheet" href="src/styles/wcfx.css" />
+<link rel="stylesheet" href="src/styles/clfx.css" />
+<link rel="stylesheet" href="src/styles/memefx.css" />
 </head>
 <body>
 <div class="app" id="app">
@@ -29,7 +33,9 @@
     <!-- ============ HERO ============ -->
     <section class="sec sec--hero" data-h="396" aria-label="MVMPACK 26 - Legends never die - new event">
       <span class="sheen" aria-hidden="true"></span>
-      <button class="hs hs--cta" data-act="event" style="--x:5%;--y:64%;--w:34%;--h:15%" aria-label="New event: Ronaldo Legend"></button>
+      <button class="hs hs--cta" data-act="event" style="--x:5%;--y:64%;--w:29%;--h:15%" aria-label="New event: Ronaldo Legend"></button>
+      <button class="hs hs--cta" data-act="cl" style="--x:36%;--y:64%;--w:29%;--h:15%" aria-label="Champions League Legends: 28 cards at 97 OVR"></button>
+      <button class="hs hs--cta" data-act="meme" style="--x:67%;--y:64%;--w:29%;--h:15%" aria-label="Meme Icons: 16 cards at 98 and 96 OVR"></button>
     </section>
 
     <!-- ============ ROW 1 : PACK OPENING / DRAFT ============ -->
@@ -84,6 +90,11 @@
 </div>
 
 <script src="src/core/data.js"></script>
+<script src="src/core/cards.js"></script>
+<script src="src/core/cards_wc.js"></script>
+<script src="src/core/cards_cl.js"></script>
+<script src="src/core/cards_meme.js"></script>
+<script src="src/core/render.js"></script>
 <script src="src/core/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,772 @@
+/* ============================================================================
+ * MVMPACK 26 — CHAMPIONS LEAGUE LEGENDS FRONT EFFECTS
+ * ----------------------------------------------------------------------------
+ * One signature animation per legend. The renderer puts two classes on the
+ * card: `clfx` (shared base) + `clfx--<anim>` (the legend's own look), where
+ * <anim> comes from the `anim` field in the UCL card database.
+ * Everything paints on the .mvm-card__fx layer, so the sliced artwork is never
+ * touched. Pure CSS — no scripts, no extra images.
+ * ==========================================================================*/
+
+/* ---------- shared base ---------- */
+.mvm-card--cl .mvm-card__inner {
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .66));
+}
+
+.mvm-card--cl .mvm-card__tag {
+  letter-spacing: .12em;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 255, 255, .22);
+}
+
+/* the UCL starball halo every legend shares */
+.clfx .mvm-card__glow { opacity: .5; }
+.clfx:hover .mvm-card__glow { opacity: 1; }
+
+.clfx .mvm-card__shine {
+  animation: cardShine 4.2s var(--ease) infinite;
+  opacity: .5;
+}
+
+.clfx:hover .mvm-card__shine,
+.clfx:focus-visible .mvm-card__shine {
+  animation-duration: 1.2s;
+  opacity: .92;
+}
+
+/* ==========================================================================
+ * 01 — DECIMA · Cristiano Ronaldo
+ * Ten silver rings blooming out of the chest, the Décima shockwave.
+ * ========================================================================*/
+.clfx--decima .mvm-card__fx::before {
+  background:
+    radial-gradient(circle at 50% 40%, transparent 22%,
+      rgba(255, 255, 255, .55) 24%, transparent 27%),
+    radial-gradient(circle at 50% 40%, transparent 40%,
+      rgba(190, 214, 255, .4) 42%, transparent 46%);
+  animation: decimaRing 2.6s ease-out infinite;
+}
+
+.clfx--decima .mvm-card__fx::after {
+  background: linear-gradient(0deg, rgba(120, 170, 255, .34), transparent 46%);
+  animation: decimaLift 2.6s ease-in-out infinite;
+}
+
+@keyframes decimaRing {
+  0%   { transform: scale(.5); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes decimaLift {
+  0%, 100% { transform: translateY(6%); opacity: .3; }
+  50%      { transform: translateY(-4%); opacity: .85; }
+}
+
+/* ==========================================================================
+ * 02 — MAGIA · Messi
+ * Blaugrana sparkle trail that curls like his slalom runs.
+ * ========================================================================*/
+.clfx--magia .mvm-card__fx::before {
+  background-image:
+    radial-gradient(1.7px 1.7px at 22% 30%, #fff, transparent),
+    radial-gradient(1.4px 1.4px at 68% 22%, #ffd9ea, transparent),
+    radial-gradient(1.9px 1.9px at 46% 62%, #fff, transparent),
+    radial-gradient(1.3px 1.3px at 80% 70%, #b7d0ff, transparent),
+    radial-gradient(1.6px 1.6px at 30% 84%, #fff, transparent);
+  animation: magiaDrift 6.5s linear infinite, magiaTwinkle 2.2s ease-in-out infinite;
+}
+
+.clfx--magia .mvm-card__fx::after {
+  background: conic-gradient(from 0deg at 50% 46%,
+    rgba(165, 0, 68, .34), transparent 32%, rgba(0, 77, 152, .34) 60%, transparent 92%);
+  animation: magiaSpin 9s linear infinite;
+}
+
+@keyframes magiaDrift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(5%, -7%, 0); }
+}
+
+@keyframes magiaTwinkle { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
+@keyframes magiaSpin { to { transform: rotate(360deg); } }
+
+/* ==========================================================================
+ * 03 — NUEVE · Benzema
+ * A cool white blade of light sliding across, the calm finisher.
+ * ========================================================================*/
+.clfx--nueve .mvm-card__fx::before {
+  background: linear-gradient(112deg,
+    transparent 34%, rgba(255, 255, 255, .6) 46%, transparent 58%);
+  animation: nueveBlade 3.4s ease-in-out infinite;
+}
+
+.clfx--nueve .mvm-card__fx::after {
+  background: radial-gradient(52% 36% at 50% 38%,
+    rgba(254, 190, 16, .34), transparent 72%);
+  animation: nuevePulse 3.4s ease-in-out infinite;
+}
+
+@keyframes nueveBlade {
+  0%   { transform: translateX(-60%); opacity: 0; }
+  35%  { opacity: .95; }
+  100% { transform: translateX(60%); opacity: 0; }
+}
+
+@keyframes nuevePulse { 0%, 100% { opacity: .3; } 50% { opacity: .8; } }
+
+/* ==========================================================================
+ * 04 — CHUPETE · Raúl
+ * Golden thumb-suck celebration glow rising from the badge.
+ * ========================================================================*/
+.clfx--chupete .mvm-card__fx::before {
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, .12) 0 3px, transparent 3px 18px);
+  mix-blend-mode: screen;
+  animation: chupeteRake 6s linear infinite;
+}
+
+.clfx--chupete .mvm-card__fx::after {
+  background: radial-gradient(40% 40% at 50% 68%,
+    rgba(254, 190, 16, .5), transparent 70%);
+  animation: chupeteRise 3s ease-in-out infinite;
+}
+
+@keyframes chupeteRake { to { transform: translateX(18px); } }
+
+@keyframes chupeteRise {
+  0%, 100% { transform: translateY(8%) scale(.94); opacity: .32; }
+  50%      { transform: translateY(-6%) scale(1.05); opacity: .85; }
+}
+
+/* ==========================================================================
+ * 05 — JOGA · Ronaldinho
+ * Samba wave in yellow-green that swings side to side, always smiling.
+ * ========================================================================*/
+.clfx--joga .mvm-card__fx::before {
+  background:
+    repeating-linear-gradient(72deg,
+      rgba(255, 212, 0, .26) 0 6%, transparent 6% 13%,
+      rgba(0, 217, 95, .24) 13% 19%, transparent 19% 26%);
+  animation: jogaSway 4.4s ease-in-out infinite;
+}
+
+.clfx--joga .mvm-card__fx::after {
+  background: radial-gradient(46% 32% at 50% 44%,
+    rgba(255, 255, 255, .32), transparent 72%);
+  animation: jogaBeat 2.2s ease-in-out infinite;
+}
+
+@keyframes jogaSway {
+  0%, 100% { transform: translateX(-8%) skewX(-4deg); }
+  50%      { transform: translateX(8%) skewX(4deg); }
+}
+
+@keyframes jogaBeat { 0%, 100% { opacity: .3; } 50% { opacity: .78; } }
+
+/* ==========================================================================
+ * 06 — VELOCITA · Kaká
+ * Straight-line speed streaks, the 60-metre run against Manchester United.
+ * ========================================================================*/
+.clfx--velocita .mvm-card__fx::before {
+  background:
+    repeating-linear-gradient(100deg,
+      rgba(255, 255, 255, .34) 0 2px, transparent 2px 12px);
+  mix-blend-mode: screen;
+  animation: velocitaStreak 1.5s linear infinite;
+}
+
+.clfx--velocita .mvm-card__fx::after {
+  background: linear-gradient(100deg,
+    rgba(0, 178, 255, .38), transparent 52%);
+  animation: velocitaSurge 2.8s ease-in-out infinite;
+}
+
+@keyframes velocitaStreak { to { transform: translateX(-24px); } }
+
+@keyframes velocitaSurge {
+  0%, 100% { opacity: .28; transform: translateX(-6%); }
+  50%      { opacity: .82; transform: translateX(6%); }
+}
+
+/* ==========================================================================
+ * 07 — SHEVA · Shevchenko
+ * Blue-and-gold Ukrainian split with a cold, decisive flash.
+ * ========================================================================*/
+.clfx--sheva .mvm-card__fx::before {
+  background: linear-gradient(180deg,
+    rgba(0, 87, 183, .42) 0 48%, rgba(255, 215, 0, .38) 52% 100%);
+  animation: shevaShift 5s ease-in-out infinite;
+}
+
+.clfx--sheva .mvm-card__fx::after {
+  background: linear-gradient(126deg,
+    transparent 40%, rgba(255, 255, 255, .66) 50%, transparent 60%);
+  animation: shevaFlash 3.2s ease-in-out infinite;
+}
+
+@keyframes shevaShift {
+  0%, 100% { opacity: .32; transform: translateY(-3%); }
+  50%      { opacity: .6; transform: translateY(3%); }
+}
+
+@keyframes shevaFlash {
+  0%   { transform: translateX(-55%); opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: translateX(55%); opacity: 0; }
+}
+
+/* ==========================================================================
+ * 08 — METRONOM · Xavi
+ * A metronome bar ticking left-right over a calm blaugrana grid.
+ * ========================================================================*/
+.clfx--metronom .mvm-card__fx::before {
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, .1) 0 1px, transparent 1px 14px),
+    repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, .1) 0 1px, transparent 1px 14px);
+  opacity: .55;
+}
+
+.clfx--metronom .mvm-card__fx::after {
+  background: linear-gradient(90deg,
+    transparent 46%, rgba(237, 187, 0, .7) 49% 51%, transparent 54%);
+  animation: metronomTick 1.8s ease-in-out infinite;
+}
+
+@keyframes metronomTick {
+  0%, 100% { transform: translateX(-30%) rotate(-3deg); }
+  50%      { transform: translateX(30%) rotate(3deg); }
+}
+
+/* ==========================================================================
+ * 09 — ILLUSION · Iniesta
+ * Silk ripples that bend around the player — escaping the press.
+ * ========================================================================*/
+.clfx--illusion .mvm-card__fx::before {
+  background:
+    repeating-radial-gradient(circle at 44% 54%,
+      rgba(255, 255, 255, .2) 0 2px, transparent 2px 16px);
+  animation: illusionRipple 5.5s ease-in-out infinite;
+}
+
+.clfx--illusion .mvm-card__fx::after {
+  background: radial-gradient(44% 34% at 44% 54%,
+    rgba(165, 0, 68, .38), transparent 72%);
+  animation: illusionFade 4s ease-in-out infinite;
+}
+
+@keyframes illusionRipple {
+  0%, 100% { transform: scale(1); opacity: .4; }
+  50%      { transform: scale(1.12); opacity: .8; }
+}
+
+@keyframes illusionFade { 0%, 100% { opacity: .28; } 50% { opacity: .72; } }
+
+/* ==========================================================================
+ * 10 — ISTANBUL · Gerrard
+ * Red comeback flame climbing from the bottom, six minutes of madness.
+ * ========================================================================*/
+.clfx--istanbul .mvm-card__fx::before {
+  background: linear-gradient(0deg,
+    rgba(200, 16, 46, .6) 0%, rgba(200, 16, 46, .22) 34%, transparent 62%);
+  animation: istanbulFlame 2.4s ease-in-out infinite;
+}
+
+.clfx--istanbul .mvm-card__fx::after {
+  background:
+    radial-gradient(circle at 50% 74%, transparent 26%,
+      rgba(0, 178, 169, .45) 28%, transparent 32%);
+  animation: istanbulRing 3.2s ease-out infinite;
+}
+
+@keyframes istanbulFlame {
+  0%, 100% { transform: translateY(8%) scaleY(.94); opacity: .4; }
+  50%      { transform: translateY(-2%) scaleY(1.06); opacity: .9; }
+}
+
+@keyframes istanbulRing {
+  0%   { transform: scale(.6); opacity: 0; }
+  35%  { opacity: .9; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+/* ==========================================================================
+ * 11 — MUNICH · Lampard
+ * Chelsea-blue chevrons marching upward — arriving late in the box.
+ * ========================================================================*/
+.clfx--munich .mvm-card__fx::before {
+  background:
+    repeating-linear-gradient(135deg,
+      rgba(3, 70, 148, .4) 0 8px, transparent 8px 20px);
+  animation: munichMarch 3.6s linear infinite;
+}
+
+.clfx--munich .mvm-card__fx::after {
+  background: radial-gradient(40% 30% at 50% 40%,
+    rgba(219, 161, 17, .4), transparent 74%);
+  animation: munichGlow 3s ease-in-out infinite;
+}
+
+@keyframes munichMarch { to { transform: translate3d(-20px, -20px, 0); } }
+@keyframes munichGlow { 0%, 100% { opacity: .3; } 50% { opacity: .8; } }
+
+/* ==========================================================================
+ * 12 — TRIGGER · Scholes
+ * A single crisp shot flash — one touch to look, one to strike.
+ * ========================================================================*/
+.clfx--trigger .mvm-card__fx::before {
+  background: radial-gradient(24% 18% at 50% 58%,
+    rgba(255, 255, 255, .8), transparent 70%);
+  animation: triggerHit 2.8s cubic-bezier(.2, .8, .2, 1) infinite;
+}
+
+.clfx--trigger .mvm-card__fx::after {
+  background: linear-gradient(0deg, rgba(218, 41, 28, .38), transparent 44%);
+  animation: triggerAfter 2.8s ease-out infinite;
+}
+
+@keyframes triggerHit {
+  0%, 62%  { transform: scale(.4); opacity: 0; }
+  70%      { transform: scale(1.15); opacity: 1; }
+  100%     { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes triggerAfter {
+  0%, 60% { opacity: .22; }
+  72%     { opacity: .82; }
+  100%    { opacity: .22; }
+}
+
+/* ==========================================================================
+ * 13 — GLASGOW · Zidane
+ * Slow silk turn — the roulette — with a white Madrid sheen.
+ * ========================================================================*/
+.clfx--glasgow .mvm-card__fx::before {
+  background: conic-gradient(from 200deg at 50% 48%,
+    rgba(255, 255, 255, .5), transparent 26%, rgba(11, 61, 145, .34) 58%, transparent 90%);
+  animation: glasgowTurn 7s linear infinite;
+}
+
+.clfx--glasgow .mvm-card__fx::after {
+  background: linear-gradient(150deg,
+    transparent 42%, rgba(255, 255, 255, .5) 52%, transparent 62%);
+  animation: glasgowSheen 4.4s ease-in-out infinite;
+}
+
+@keyframes glasgowTurn { to { transform: rotate(360deg); } }
+
+@keyframes glasgowSheen {
+  0%   { transform: translate3d(-45%, 12%, 0); opacity: 0; }
+  45%  { opacity: .9; }
+  100% { transform: translate3d(45%, -12%, 0); opacity: 0; }
+}
+
+/* ==========================================================================
+ * 14 — QUATTRO · Seedorf
+ * Four medal bands lighting up one after another.
+ * ========================================================================*/
+.clfx--quattro .mvm-card__fx::before {
+  background: linear-gradient(180deg,
+    rgba(251, 9, 11, .34) 0 24%, transparent 24% 26%,
+    rgba(255, 255, 255, .26) 26% 50%, transparent 50% 52%,
+    rgba(251, 9, 11, .34) 52% 76%, transparent 76% 78%,
+    rgba(255, 255, 255, .26) 78% 100%);
+  animation: quattroBands 4.8s steps(4, end) infinite;
+}
+
+.clfx--quattro .mvm-card__fx::after {
+  background: radial-gradient(46% 34% at 50% 44%,
+    rgba(201, 162, 39, .34), transparent 74%);
+  animation: quattroGlow 3.4s ease-in-out infinite;
+}
+
+@keyframes quattroBands {
+  0%   { opacity: .25; }
+  50%  { opacity: .8; }
+  100% { opacity: .25; }
+}
+
+@keyframes quattroGlow { 0%, 100% { opacity: .3; } 50% { opacity: .75; } }
+
+/* ==========================================================================
+ * 15 — MAESTRO · Pirlo
+ * A conductor's baton line drawing a slow curve — the free-kick trajectory.
+ * ========================================================================*/
+.clfx--maestro .mvm-card__fx::before {
+  background:
+    radial-gradient(60% 3% at 20% 70%, rgba(255, 255, 255, .5), transparent 70%);
+  animation: maestroBaton 5.2s ease-in-out infinite;
+}
+
+.clfx--maestro .mvm-card__fx::after {
+  background: linear-gradient(0deg, rgba(201, 162, 39, .34), transparent 48%);
+  animation: maestroCalm 5.2s ease-in-out infinite;
+}
+
+@keyframes maestroBaton {
+  0%   { transform: translate3d(-14%, 10%, 0) rotate(-16deg); opacity: 0; }
+  40%  { opacity: .9; }
+  100% { transform: translate3d(22%, -22%, 0) rotate(14deg); opacity: 0; }
+}
+
+@keyframes maestroCalm { 0%, 100% { opacity: .26; } 50% { opacity: .66; } }
+
+/* ==========================================================================
+ * 16 — CURVA · Beckham
+ * Bending arcs sweeping in from the corner flag.
+ * ========================================================================*/
+.clfx--curva .mvm-card__fx::before {
+  background:
+    repeating-radial-gradient(circle at 6% 96%,
+      rgba(255, 255, 255, .26) 0 2px, transparent 2px 22px);
+  animation: curvaArc 4.2s ease-in-out infinite;
+}
+
+.clfx--curva .mvm-card__fx::after {
+  background: linear-gradient(38deg, rgba(218, 41, 28, .36), transparent 54%);
+  animation: curvaGlow 4.2s ease-in-out infinite;
+}
+
+@keyframes curvaArc {
+  0%, 100% { transform: scale(.94) rotate(-2deg); opacity: .4; }
+  50%      { transform: scale(1.14) rotate(2deg); opacity: .85; }
+}
+
+@keyframes curvaGlow { 0%, 100% { opacity: .26; } 50% { opacity: .7; } }
+
+/* ==========================================================================
+ * 17 — GINGA · Neymar
+ * Yellow-green zig-zag that dances — rainbow flick energy.
+ * ========================================================================*/
+.clfx--ginga .mvm-card__fx::before {
+  background:
+    repeating-linear-gradient(58deg,
+      rgba(255, 212, 0, .3) 0 5%, transparent 5% 11%,
+      rgba(0, 217, 95, .28) 11% 16%, transparent 16% 22%);
+  animation: gingaDance 2.8s ease-in-out infinite;
+}
+
+.clfx--ginga .mvm-card__fx::after {
+  background: radial-gradient(40% 30% at 52% 42%,
+    rgba(255, 255, 255, .38), transparent 72%);
+  animation: gingaPop 1.9s ease-in-out infinite;
+}
+
+@keyframes gingaDance {
+  0%   { transform: translate3d(-7%, 3%, 0) skewY(-3deg); }
+  50%  { transform: translate3d(7%, -3%, 0) skewY(3deg); }
+  100% { transform: translate3d(-7%, 3%, 0) skewY(-3deg); }
+}
+
+@keyframes gingaPop { 0%, 100% { opacity: .3; transform: scale(.96); } 50% { opacity: .8; transform: scale(1.06); } }
+
+/* ==========================================================================
+ * 18 — VAVAVOOM · Henry
+ * Long horizontal speed lines with a garnet-red afterburn.
+ * ========================================================================*/
+.clfx--vavavoom .mvm-card__fx::before {
+  background:
+    repeating-linear-gradient(92deg,
+      rgba(255, 255, 255, .3) 0 2px, transparent 2px 15px);
+  mix-blend-mode: screen;
+  animation: vavaLines 1.7s linear infinite;
+}
+
+.clfx--vavavoom .mvm-card__fx::after {
+  background: linear-gradient(268deg, rgba(165, 0, 68, .4), transparent 56%);
+  animation: vavaBurn 3s ease-in-out infinite;
+}
+
+@keyframes vavaLines { to { transform: translateX(-20px); } }
+
+@keyframes vavaBurn {
+  0%, 100% { opacity: .26; transform: translateX(5%); }
+  50%      { opacity: .8; transform: translateX(-5%); }
+}
+
+/* ==========================================================================
+ * 19 — LION · Drogba
+ * A heavy orange roar pulse expanding from the chest.
+ * ========================================================================*/
+.clfx--lion .mvm-card__fx::before {
+  background:
+    radial-gradient(circle at 50% 46%, transparent 20%,
+      rgba(255, 121, 0, .5) 23%, transparent 27%),
+    radial-gradient(circle at 50% 46%, transparent 38%,
+      rgba(255, 121, 0, .3) 41%, transparent 46%);
+  animation: lionRoar 2.9s ease-out infinite;
+}
+
+.clfx--lion .mvm-card__fx::after {
+  background: linear-gradient(0deg, rgba(3, 70, 148, .42), transparent 48%);
+  animation: lionPower 2.9s ease-in-out infinite;
+}
+
+@keyframes lionRoar {
+  0%   { transform: scale(.55); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+@keyframes lionPower { 0%, 100% { opacity: .3; } 50% { opacity: .8; } }
+
+/* ==========================================================================
+ * 20 — WOLF · Haaland
+ * Cold sky-blue frost breath with sharp diagonal ice shards.
+ * ========================================================================*/
+.clfx--wolf .mvm-card__fx::before {
+  background:
+    repeating-linear-gradient(66deg,
+      rgba(108, 171, 221, .34) 0 3px, transparent 3px 18px);
+  animation: wolfShards 3.4s linear infinite;
+}
+
+.clfx--wolf .mvm-card__fx::after {
+  background: radial-gradient(50% 36% at 50% 40%,
+    rgba(224, 240, 255, .44), transparent 74%);
+  animation: wolfBreath 3.4s ease-in-out infinite;
+}
+
+@keyframes wolfShards { to { transform: translate3d(-18px, 9px, 0); } }
+
+@keyframes wolfBreath {
+  0%, 100% { opacity: .28; transform: scale(.95); }
+  50%      { opacity: .82; transform: scale(1.08); }
+}
+
+/* ==========================================================================
+ * 21 — ZLATAN · Ibrahimović
+ * A slow taekwondo arc sweeping across, gold on black.
+ * ========================================================================*/
+.clfx--zlatan .mvm-card__fx::before {
+  background: conic-gradient(from 120deg at 50% 54%,
+    rgba(254, 204, 2, .46), transparent 22%, transparent 78%, rgba(254, 204, 2, .3));
+  animation: zlatanKick 4.6s ease-in-out infinite;
+}
+
+.clfx--zlatan .mvm-card__fx::after {
+  background: linear-gradient(0deg, rgba(0, 0, 0, .5), transparent 42%);
+  animation: zlatanShade 4.6s ease-in-out infinite;
+}
+
+@keyframes zlatanKick {
+  0%   { transform: rotate(-24deg); opacity: .3; }
+  50%  { transform: rotate(24deg); opacity: .85; }
+  100% { transform: rotate(-24deg); opacity: .3; }
+}
+
+@keyframes zlatanShade { 0%, 100% { opacity: .5; } 50% { opacity: .8; } }
+
+/* ==========================================================================
+ * 22 — BANDIERA · Maldini
+ * Rossoneri flag waving slowly — 25 seasons, one badge.
+ * ========================================================================*/
+.clfx--bandiera .mvm-card__fx::before {
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(251, 9, 11, .38) 0 8%, rgba(0, 0, 0, .38) 8% 16%);
+  animation: bandieraWave 5.6s ease-in-out infinite;
+}
+
+.clfx--bandiera .mvm-card__fx::after {
+  background: linear-gradient(96deg,
+    transparent 40%, rgba(255, 255, 255, .38) 50%, transparent 60%);
+  animation: bandieraSheen 5.6s ease-in-out infinite;
+}
+
+@keyframes bandieraWave {
+  0%, 100% { transform: skewY(-2.5deg) translateX(-4%); opacity: .42; }
+  50%      { transform: skewY(2.5deg) translateX(4%); opacity: .7; }
+}
+
+@keyframes bandieraSheen {
+  0%   { transform: translateX(-50%); opacity: 0; }
+  50%  { opacity: .8; }
+  100% { transform: translateX(50%); opacity: 0; }
+}
+
+/* ==========================================================================
+ * 23 — ELEGANZA · Nesta
+ * A single clean silver diagonal — the perfect tackle, no contact.
+ * ========================================================================*/
+.clfx--eleganza .mvm-card__fx::before {
+  background: linear-gradient(122deg,
+    transparent 42%, rgba(192, 198, 207, .66) 50%, transparent 58%);
+  animation: eleganzaSlide 3.8s cubic-bezier(.25, .9, .2, 1) infinite;
+}
+
+.clfx--eleganza .mvm-card__fx::after {
+  background: radial-gradient(48% 34% at 50% 46%,
+    rgba(255, 255, 255, .24), transparent 74%);
+  animation: eleganzaCalm 3.8s ease-in-out infinite;
+}
+
+@keyframes eleganzaSlide {
+  0%   { transform: translate3d(-55%, 18%, 0); opacity: 0; }
+  45%  { opacity: 1; }
+  100% { transform: translate3d(55%, -18%, 0); opacity: 0; }
+}
+
+@keyframes eleganzaCalm { 0%, 100% { opacity: .22; } 50% { opacity: .6; } }
+
+/* ==========================================================================
+ * 24 — TIBURON · Puyol
+ * Aggressive blaugrana claw stripes closing in from both sides.
+ * ========================================================================*/
+.clfx--tiburon .mvm-card__fx::before {
+  background:
+    linear-gradient(90deg, rgba(165, 0, 68, .46), transparent 30%),
+    linear-gradient(270deg, rgba(0, 77, 152, .46), transparent 30%);
+  animation: tiburonClamp 2.6s ease-in-out infinite;
+}
+
+.clfx--tiburon .mvm-card__fx::after {
+  background:
+    repeating-linear-gradient(76deg,
+      rgba(255, 255, 255, .2) 0 2px, transparent 2px 20px);
+  animation: tiburonRake 4s linear infinite;
+}
+
+@keyframes tiburonClamp {
+  0%, 100% { transform: scaleX(1); opacity: .34; }
+  50%      { transform: scaleX(1.18); opacity: .82; }
+}
+
+@keyframes tiburonRake { to { transform: translateX(20px); } }
+
+/* ==========================================================================
+ * 25 — NOVENTA · Sergio Ramos
+ * A clock sweep hand hitting 93:20, gold on white.
+ * ========================================================================*/
+.clfx--noventa .mvm-card__fx::before {
+  background: conic-gradient(from 0deg at 50% 50%,
+    rgba(254, 190, 16, .55) 0 8deg, transparent 8deg 360deg);
+  animation: noventaSweep 3s linear infinite;
+}
+
+.clfx--noventa .mvm-card__fx::after {
+  background:
+    radial-gradient(circle at 50% 50%, transparent 44%,
+      rgba(255, 255, 255, .5) 46%, transparent 50%);
+  animation: noventaTick 3s steps(12, end) infinite;
+}
+
+@keyframes noventaSweep { to { transform: rotate(360deg); } }
+
+@keyframes noventaTick {
+  0%, 100% { opacity: .3; }
+  85%      { opacity: .95; }
+}
+
+/* ==========================================================================
+ * 26 — CAPTAIN · Terry
+ * A shield of blue bars snapping shut in front of the goal.
+ * ========================================================================*/
+.clfx--captain .mvm-card__fx::before {
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(3, 70, 148, .42) 0 6px, transparent 6px 16px);
+  animation: captainBlock 2.4s ease-in-out infinite;
+}
+
+.clfx--captain .mvm-card__fx::after {
+  background: radial-gradient(44% 34% at 50% 50%,
+    rgba(255, 255, 255, .34), transparent 72%);
+  animation: captainShield 2.4s ease-in-out infinite;
+}
+
+@keyframes captainBlock {
+  0%, 100% { transform: scaleY(1); opacity: .34; }
+  50%      { transform: scaleY(1.12); opacity: .8; }
+}
+
+@keyframes captainShield { 0%, 100% { opacity: .24; transform: scale(.94); } 50% { opacity: .7; transform: scale(1.06); } }
+
+/* ==========================================================================
+ * 27 — GUARDIAN · Casillas (GK)
+ * Reflex web that snaps outward, cyan on white — the save reflex.
+ * ========================================================================*/
+.clfx--guardian .mvm-card__fx::before {
+  background:
+    repeating-conic-gradient(from 0deg at 50% 52%,
+      rgba(0, 163, 224, .3) 0deg 4deg, transparent 4deg 20deg);
+  animation: guardianWeb 4.4s ease-in-out infinite;
+}
+
+.clfx--guardian .mvm-card__fx::after {
+  background:
+    radial-gradient(circle at 50% 52%, transparent 24%,
+      rgba(255, 255, 255, .5) 26%, transparent 30%);
+  animation: guardianSnap 2.2s cubic-bezier(.2, .9, .2, 1) infinite;
+}
+
+@keyframes guardianWeb {
+  0%, 100% { transform: scale(.96) rotate(-3deg); opacity: .4; }
+  50%      { transform: scale(1.08) rotate(3deg); opacity: .8; }
+}
+
+@keyframes guardianSnap {
+  0%   { transform: scale(.5); opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* ==========================================================================
+ * 28 — SUPERMAN · Buffon (GK)
+ * A wide white dive streak across black-and-white bars.
+ * ========================================================================*/
+.clfx--superman .mvm-card__fx::before {
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(0, 0, 0, .44) 0 7%, rgba(255, 255, 255, .2) 7% 14%);
+  opacity: .5;
+}
+
+.clfx--superman .mvm-card__fx::after {
+  background: linear-gradient(104deg,
+    transparent 32%, rgba(255, 255, 255, .7) 48%, transparent 64%);
+  animation: supermanDive 3.2s cubic-bezier(.3, .85, .2, 1) infinite;
+}
+
+@keyframes supermanDive {
+  0%   { transform: translate3d(-60%, 20%, 0) rotate(-8deg); opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: translate3d(60%, -20%, 0) rotate(8deg); opacity: 0; }
+}
+
+/* ==========================================================================
+ * accessibility — respect the OS "reduce motion" setting
+ * ========================================================================*/
+@media (prefers-reduced-motion: reduce) {
+  .clfx .mvm-card__fx,
+  .clfx .mvm-card__fx::before,
+  .clfx .mvm-card__fx::after,
+  .clfx .mvm-card__shine {
+    animation: none !important;
+  }
+  .clfx .mvm-card__fx::before { opacity: .5; }
+  .clfx .mvm-card__fx::after  { opacity: .35; }
+}
+
+/* ==========================================================================
+ * UCL card frame — starball silver/navy trim that separates the set
+ * ========================================================================*/
+.mvm-card--cl .mvm-card__glow {
+  background: radial-gradient(60% 60% at 50% 40%,
+    rgba(190, 214, 255, .55), transparent 70%);
+}
+
+.mvm-card--cl .mvm-back {
+  box-shadow:
+    inset 0 0 0 2px rgba(190, 214, 255, .45),
+    inset 0 0 34px rgba(11, 30, 70, .6);
+}
+
+/* section heading for the UCL block in the collection screen */
+.clsec__title {
+  margin-top: 6%;
+  padding-top: 4%;
+  border-top: 1px solid rgba(190, 214, 255, .22);
+}
