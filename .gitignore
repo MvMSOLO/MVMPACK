@@ -6,3 +6,6 @@ __pycache__/
 .venv/
 .idea/
 .vscode/
+
+# 187M of raw scraped player photos: source material, not shipped assets
+assets/players/raw/

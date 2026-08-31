@@ -80,7 +80,7 @@
       '<button type="button" class="' + cls + '" data-card="' + esc(c.id) + '"' +
       ' style="--c1:' + esc(b.c1) + ';--c2:' + esc(b.c2) + '"' +
       ' aria-label="' + esc(c.name + ", " + ovr + " " + c.pos + ", " + c.nation +
-                            ". Tap to flip the card") + '">' +
+                            ". Tap to open the full stat sheet") + '">' +
         '<span class="mvm-card__glow" aria-hidden="true"></span>' +
         '<span class="mvm-card__inner">' +
 
@@ -115,12 +115,54 @@
       '</button>';
   }
 
+  /* ------------------------------------------------------ standard cards --
+   * The 220-card standard set (60-88 OVR) uses a flat, animation-free layout:
+   * real portrait, tier frame, OVR / POS / league header and six main stats.
+   */
+  function stdMarkup(c, opts) {
+    opts = opts || {};
+    var ovr = c.ovr || 60;
+    var tier = c.tier || c.stdTier || "bronze";
+    var m = c.main || {};
+    var stats = Object.keys(m).map(function (k) {
+      return "<i><b>" + esc(m[k]) + "</b><span>" + esc(k) + "</span></i>";
+    }).join("");
+
+    return '<button type="button" class="stdc t-' + esc(tier) +
+      (opts.big ? " big" : "") + '" data-card="' + esc(c.id) + '"' +
+      ' aria-label="' + esc(c.name + ", " + ovr + " " + c.pos + ", " + c.club +
+        ". Tap to open the full stat sheet") + '">' +
+      '<span class="std-frame" aria-hidden="true"></span>' +
+      '<img class="std-photo" src="' + esc(c.photo || c.art) + '" alt="" ' +
+           'loading="lazy" decoding="async" />' +
+      '<span class="std-top">' +
+        '<span class="std-ovr">' + esc(ovr) + "</span>" +
+        '<span class="std-pos">' + esc(c.pos) + "</span>" +
+        '<span class="std-league">' + esc(c.flag) + "</span>" +
+      "</span>" +
+      '<span class="std-name">' + esc(c.name) + "</span>" +
+      '<span class="std-stats">' + stats + "</span>" +
+      "</button>";
+  }
+
+  /* one entry point for every card: standard set goes flat, the rest animate */
+  function anyCard(c, opts) {
+    return c && c.type === "std" ? stdMarkup(c, opts) : cardMarkup(c, opts);
+  }
+
   /* --------------------------------------------------------------- grids -- */
   function grid(list, opts) {
     var cells = list.map(function (c) {
-      return '<li class="cardgrid__cell">' + cardMarkup(c, opts) + '</li>';
+      return '<li class="cardgrid__cell">' + anyCard(c, opts) + '</li>';
     }).join("");
     return '<ul class="cardgrid">' + cells + '</ul>';
+  }
+
+  /* std sections share the same header + grid shape */
+  function stdSection(list, label, note) {
+    if (!list || !list.length) { return ""; }
+    return "<h3>" + esc(label) + " \u2014 " + list.length + " cards</h3>" +
+      '<p class="hint">' + esc(note) + "</p>" + grid(list);
   }
 
   /* --------------------------------------------------------- stat sheet -- */
@@ -162,7 +204,7 @@
     var b = c.back;
     return '<div class="cdetail" style="--c1:' + esc(b.c1) + ';--c2:' + esc(b.c2) + '">' +
       '<div class="cdetail__top">' +
-        cardMarkup(c) +
+        anyCard(c, { big: true }) +
         '<div class="cdetail__meta">' +
           '<h3 class="cdetail__name">' + esc(c.flag + " " + c.name) + "</h3>" +
           '<span class="cdetail__full">' + esc(c.full) + "</span>" +
@@ -204,7 +246,7 @@
                 esc(c.anim.toUpperCase()) + "</span></div>" : "") +
       '<h4 class="sec-title">Card back \u2014 ' + esc(b.theme) + "</h4>" +
       '<p class="hint">Serial ' + esc(b.serial) + " &middot; signed " +
-        esc(b.sign) + " &middot; tap the card to flip it</p>" +
+        esc(b.sign) + " &middot; double tap the card to see its back</p>" +
       "</div>";
   }
 
@@ -227,7 +269,7 @@
       if (!c) { return ""; }
       used[c.id] = 1;
       return '<div class="pitch__slot" style="--x:' + s.x + '%;--y:' + s.y + '%">' +
-             cardMarkup(c, { tag: false }) + "</div>";
+             anyCard(c, { tag: false }) + "</div>";
     }).join("");
     return '<div class="pitch">' + slots + "</div>";
   }
@@ -255,7 +297,7 @@
       ((DB.meme || []).length) + " Meme Icons at 98 / 96";
 
     return '<div class="packstage">' +
-      cardMarkup(c, { flipped: !revealed, reveal: revealed }) +
+      anyCard(c, { flipped: !revealed, reveal: revealed }) +
       '<p class="hint">' +
         (revealed ? esc(c.name) + " \u2014 " + esc(c.ovr || 99) + " " + esc(c.pos) +
                     " &middot; " + esc(c.back.serial) +
@@ -282,7 +324,9 @@
 
   window.MVM_UI = {
     esc: esc,
-    card: cardMarkup,
+    card: anyCard,
+    stdCard: stdMarkup,
+    iconCard: cardMarkup,
     grid: grid,
     detail: detail,
     pitch: pitch,
@@ -297,11 +341,12 @@
         var cl = DB.cl || [];
         var ma = DB.memeA || [];
         var mb = DB.memeB || [];
+        var std = DB.std || [];
         return {
           title: "MY CLUB \u00b7 " + DB.count + " CARDS",
           html: "<h3>Icons \u2014 " + icons.length + " cards at 99 OVR</h3>" +
-                '<p class="hint">Tap a card to flip it, tap the row below for ' +
-                "the full stat sheet.</p>" + grid(icons) +
+                '<p class="hint">Tap any card to open its full stat sheet, ' +
+                "double tap to flip it.</p>" + grid(icons) +
                 (wc.length
                   ? '<h3 class="wcsec__title">World Cup Heroes \u2014 ' +
                     wc.length + " cards at 98 OVR</h3>" +
@@ -311,8 +356,8 @@
                 (cl.length
                   ? '<h3 class="clsec__title">Champions League Legends \u2014 ' +
                     cl.length + " cards at 97 OVR</h3>" +
-                    '<p class="hint">Kings of Europe \u2014 each legend flips to ' +
-                    "his own starball back.</p>" + grid(cl)
+                    '<p class="hint">Kings of Europe \u2014 tap a legend for his ' +
+                    "full stat sheet.</p>" + grid(cl)
                   : "") +
                 (ma.length
                   ? '<h3 class="memesec__title">Meme Icons \u00b7 Prime \u2014 ' +
@@ -325,7 +370,60 @@
                     mb.length + " cards at 96 OVR</h3>" +
                     '<p class="hint">The easy pulls \u2014 still bussin.</p>' +
                     grid(mb)
+                  : "") +
+                (std.length
+                  ? '<h3 class="stdsec__title">MVM Standard \u2014 ' +
+                    std.length + " cards at 60\u201388 OVR</h3>" +
+                    '<p class="hint">The everyday squad players: gold, silver ' +
+                    "and bronze tiers with real portraits.</p>" +
+                    grid(std.slice(0, 30)) +
+                    '<div class="actbar">' +
+                      '<button type="button" class="btn" data-screen="std">' +
+                      "OPEN THE FULL STANDARD SET</button></div>"
                   : "")
+        };
+      },
+      std: function () {
+        return {
+          title: "MVM STANDARD \u00b7 " + (DB.std || []).length + " CARDS",
+          html: '<div class="actbar">' +
+              '<button type="button" class="btn" data-screen="gold">GOLD ' +
+                ((DB.stdGold || []).length) + "</button>" +
+              '<button type="button" class="btn btn--ghost" data-screen="silver">' +
+                "SILVER " + ((DB.stdSilver || []).length) + "</button>" +
+              '<button type="button" class="btn btn--ghost" data-screen="bronze">' +
+                "BRONZE " + ((DB.stdBronze || []).length) + "</button>" +
+            "</div>" +
+            stdSection(DB.stdGold, "Gold \u00b7 80\u201388 OVR",
+              "The best of the standard set \u2014 tap a card for its full sheet.") +
+            stdSection(DB.stdSilver, "Silver \u00b7 72\u201379 OVR",
+              "Solid squad depth and the cheapest chemistry links.") +
+            stdSection(DB.stdBronze, "Bronze \u00b7 60\u201369 OVR",
+              "Where every collection starts \u2014 quick-sell fodder or a bargain.")
+        };
+      },
+      gold: function () {
+        return {
+          title: "STANDARD GOLD",
+          html: stdSection(DB.stdGold, "Gold \u00b7 80\u201388 OVR",
+            "29 attributes, real portraits, no animation \u2014 pure football.") ||
+            '<p class="hint">No gold cards loaded.</p>'
+        };
+      },
+      silver: function () {
+        return {
+          title: "STANDARD SILVER",
+          html: stdSection(DB.stdSilver, "Silver \u00b7 72\u201379 OVR",
+            "The engine room of any budget squad.") ||
+            '<p class="hint">No silver cards loaded.</p>'
+        };
+      },
+      bronze: function () {
+        return {
+          title: "STANDARD BRONZE",
+          html: stdSection(DB.stdBronze, "Bronze \u00b7 60\u201369 OVR",
+            "Cheap, cheerful and the fastest way to fill a formation.") ||
+            '<p class="hint">No bronze cards loaded.</p>'
         };
       },
       squad: function () {
@@ -370,7 +468,7 @@
         return {
           title: "WORLD CUP HEROES",
           html: "<h3>" + wc.length + " heroes \u00b7 98 OVR</h3>" +
-                '<p class="hint">Each card animates differently \u2014 tap to flip.</p>' +
+                '<p class="hint">Each card animates differently \u2014 tap for stats.</p>' +
                 grid(wc)
         };
       },
@@ -380,7 +478,7 @@
           title: "CHAMPIONS LEAGUE LEGENDS",
           html: "<h3>" + cl.length + " legends \u00b7 97 OVR</h3>" +
                 '<p class="hint">Every legend has his own signature animation ' +
-                "and his own full stat sheet \u2014 tap to flip.</p>" +
+                "and his own full stat sheet \u2014 tap to open it.</p>" +
                 grid(cl)
         };
       },

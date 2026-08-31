@@ -55,24 +55,55 @@
     }).join("") + "</div>";
   }
 
+  /* every OVR a pack can print, highest first — read straight off its table */
+  function tiersOf(tbl) {
+    return Object.keys(tbl).map(Number).sort(function (a, b) { return b - a; });
+  }
+
+  /* colour bucket for an OVR chip: legends keep their own tints, the base set
+   * is coloured by its gold / silver / bronze window */
+  function oddsClass(t) {
+    if (t >= 96) { return "odds--" + t; }
+    if (t >= 80) { return "odds--stdgold"; }
+    if (t >= 70) { return "odds--stdsilver"; }
+    return "odds--stdbronze";
+  }
+
+  function oddsChip(t, tbl, live) {
+    var boost = live[t] > tbl[t] * 1.02 ? " → " + pct(live[t]) : "";
+    return '<span class="odds ' + oddsClass(t) + '">' + esc(String(t)) + " · " +
+      esc(pct(tbl[t]) + boost) + "</span>";
+  }
+
+  /* A standard pack spreads over up to ten OVRs, which is far too many chips
+   * for a phone shelf. Print the three best ones and fold the remainder into a
+   * single range chip carrying their combined odds. */
+  function oddsStrip(tbl, live) {
+    var tiers = tiersOf(tbl);
+    var shown = tiers.length > 4 ? tiers.slice(0, 3) : tiers;
+    var rest = tiers.slice(shown.length);
+    var chips = shown.map(function (t) { return oddsChip(t, tbl, live); });
+
+    if (rest.length) {
+      var sum = 0, i;
+      for (i = 0; i < rest.length; i++) { sum += tbl[rest[i]]; }
+      chips.push('<span class="odds ' + oddsClass(rest[0]) + ' odds--rest">' +
+        esc(rest[rest.length - 1] + "–" + rest[0]) + " · " + esc(pct(sum)) +
+        "</span>");
+    }
+    return chips.join("");
+  }
+
   /* --------------------------------------------------------- a pack shelf -- */
   function packCard(p) {
     var cost = PK.price(p, picked);
     var tbl = PK.odds(p.id, false);
     var live = PK.odds(p.id, true);
     var locked = !EC.canPay(cost);
-
-    var chips = [99, 98, 97, 96].filter(function (t) {
-      return tbl[t] !== undefined;
-    }).map(function (t) {
-      var boost = live[t] > tbl[t] * 1.02
-        ? " → " + pct(live[t])
-        : "";
-      return '<span class="odds odds--' + t + '">' + t + " · " +
-        esc(pct(tbl[t]) + boost) + "</span>";
-    }).join("");
+    var chips = oddsStrip(tbl, live);
 
     return '<li><button type="button" class="packcard packcard--' + esc(p.tone) +
+      (p.std ? " packcard--std" : "") +
       (locked ? " is-locked" : "") + '" data-pack="' + esc(p.id) + '">' +
       '<span class="packcard__head">' +
         '<span class="packcard__name">' + esc(p.name) + "</span>" +
@@ -91,12 +122,25 @@
       ? "LUCK CHARM ACTIVE · " + st.charm + " PACKS LEFT"
       : "BUY LUCK CHARM · " + EC.fmt(PK.charm.cost.gems) + " ◆";
 
+    var legends = PK.all.filter(function (p) { return !p.std; });
+    var base = PK.all.filter(function (p) { return p.std; });
+
+    function shelf(label, note, list) {
+      if (!list.length) { return ""; }
+      return '<h3 class="shelfttl">' + esc(label) + "</h3>" +
+        '<p class="hint hint--tight">' + esc(note) + "</p>" +
+        '<ul class="packlist">' + list.map(packCard).join("") + "</ul>";
+    }
+
     return {
       title: "PACK STORE",
       html: wallet() + multiRow() +
-        '<ul class="packlist">' +
-          PK.all.map(packCard).join("") +
-        "</ul>" +
+        shelf("Legend packs · 96–99",
+              "Icons, World Cup heroes, Champions League legends and memes.",
+              legends) +
+        shelf("Standard packs · 60–88",
+              "The 220-card MVM 26 base set — cheap, fast, no legends inside.",
+              base) +
         '<div class="actbar">' +
           '<button type="button" class="btn btn--ghost" data-charm="1">' +
             esc(charmTxt) + "</button>" +
@@ -109,7 +153,8 @@
         "odds at luck " + esc(EC.luck()) + ". Dry runs raise your luck, a 98+ " +
         "resets it. Pity: guaranteed 98+ after " + PK.pity.p98 +
         " cards, guaranteed 99 after " + PK.pity.p99 + " cards — you are at " +
-        esc(st.pity98) + " / " + esc(st.pity99) + ".</p>"
+        esc(st.pity98) + " / " + esc(st.pity99) + ". Standard packs roll inside " +
+        "their own OVR window and never touch those counters.</p>"
     };
   }
 
@@ -166,8 +211,8 @@
           '<button type="button" class="btn btn--ghost" data-screen="store">' +
             "BACK TO STORE</button>" +
         "</div>" +
-        '<p class="hint">Tap a card to flip it, double tap for the full stat ' +
-        "sheet. Duplicates can be quick-sold for coins.</p>"
+        '<p class="hint">Tap a card to open its full stat sheet, double tap to ' +
+        "flip it. Duplicates can be quick-sold for coins.</p>"
     };
   }
 

@@ -3,11 +3,20 @@
  * ----------------------------------------------------------------------------
  * THE PROBABILITY MODEL
  *
- * Cards live in four OVR tiers:
+ * Cards live in two families.
+ *
+ * LEGEND cards, four OVR tiers:
  *   99  Icons (21)                        — the jackpot
  *   98  World Cup Heroes + Prime Meme (26)
  *   97  Champions League Legends (28)
  *   96  Meme Icons · tier B (8)
+ *
+ * STANDARD cards (220), three tiers of the MVM 26 base set:
+ *   80–88  gold      · the base-set stars
+ *   72–79  silver    · solid squad players
+ *   60–69  bronze    · the everyday filler
+ * Standard packs are cheap, roll only inside their own OVR window and never
+ * touch the legend pity counters — they are the grind, not the jackpot.
  *
  * Every pack owns a WEIGHT TABLE over those tiers plus a `floor` (the lowest
  * OVR it can ever produce). Printed odds are the nominal, luck-free numbers:
@@ -41,7 +50,7 @@
       sub: "1 card · 96+ guaranteed",
       cards: 1,
       floor: 96,
-      cost: { coins: 25000 },
+      cost: { coins: 250000 },
       table: { 96: 96.0, 97: 3.5, 98: 0.498, 99: 0.002 },
       tone: "green"
     },
@@ -51,7 +60,7 @@
       sub: "3 cards · better 98 odds",
       cards: 3,
       floor: 96,
-      cost: { coins: 120000 },
+      cost: { coins: 1200000 },
       table: { 96: 88.0, 97: 10.5, 98: 1.49, 99: 0.01 },
       tone: "gold"
     },
@@ -61,7 +70,7 @@
       sub: "5 cards · meme-loaded",
       cards: 5,
       floor: 96,
-      cost: { coins: 900000, gems: 40 },
+      cost: { coins: 9000000, gems: 400 },
       table: { 96: 70.0, 97: 24.0, 98: 5.9, 99: 0.1 },
       memeBoost: true,
       tone: "purple"
@@ -72,7 +81,7 @@
       sub: "3 cards · nothing below 97",
       cards: 3,
       floor: 97,
-      cost: { coins: 2400000, gems: 120 },
+      cost: { coins: 24000000, gems: 1200 },
       table: { 97: 89.0, 98: 9.0, 99: 2.0 },
       tone: "cyan"
     },
@@ -82,7 +91,7 @@
       sub: "2 cards · heroes & prime memes",
       cards: 2,
       floor: 98,
-      cost: { coins: 9000000, gems: 450 },
+      cost: { coins: 90000000, gems: 4500 },
       table: { 98: 88.0, 99: 12.0 },
       tone: "red"
     },
@@ -92,10 +101,48 @@
       sub: "1 card · 100% guaranteed icon",
       cards: 1,
       floor: 99,
-      cost: { coins: 38000000, gems: 1800 },
+      cost: { coins: 380000000, gems: 18000 },
       table: { 99: 100 },
       guaranteed: 99,
       tone: "icon"
+    },
+
+    /* ---- standard set packs (60–88 OVR, no legends inside) -------------- */
+    {
+      id: "std_bronze",
+      name: "BRONZE STANDARD",
+      sub: "3 cards · 60–69 base set",
+      cards: 3,
+      floor: 60,
+      cost: { coins: 12000 },
+      table: { 60: 1.0, 61: 1.5, 62: 2.0, 63: 2.5, 64: 4.0, 65: 5.0,
+               66: 9.0, 67: 15.0, 68: 25.0, 69: 35.0 },
+      std: true,
+      tone: "bronze"
+    },
+    {
+      id: "std_silver",
+      name: "SILVER STANDARD",
+      sub: "3 cards · 72–79 base set",
+      cards: 3,
+      floor: 72,
+      cost: { coins: 90000 },
+      table: { 72: 4.0, 73: 5.0, 74: 12.0, 75: 13.0, 76: 20.0, 77: 20.0,
+               78: 15.0, 79: 11.0 },
+      std: true,
+      tone: "silver"
+    },
+    {
+      id: "std_gold",
+      name: "GOLD STANDARD",
+      sub: "2 cards · 80–88 base set",
+      cards: 2,
+      floor: 80,
+      cost: { coins: 420000 },
+      table: { 80: 40.0, 81: 17.0, 82: 15.0, 83: 8.0, 84: 11.0, 85: 4.0,
+               86: 2.5, 87: 1.5, 88: 1.0 },
+      std: true,
+      tone: "stdgold"
     }
   ];
 
@@ -107,7 +154,14 @@
     return DB.all.filter(function (c) { return (c.ovr || 99) === ovr; });
   }
 
-  var POOL = { 96: poolFor(96), 97: poolFor(97), 98: poolFor(98), 99: poolFor(99) };
+  /* every OVR the app can roll: the 220-card standard set plus the legends */
+  var POOL = {};
+  (function () {
+    for (var o = 60; o <= 99; o++) {
+      var pool = poolFor(o);
+      if (pool.length) { POOL[o] = pool; }
+    }
+  })();
 
   /* ------------------------------------------------------- multipliers ---- */
   var MULTI = [
@@ -135,6 +189,22 @@
    * Returns the effective weight table for a pack at a given luck value.
    */
   var LUCK_GAIN = { 99: 1.5, 98: 0.8, 97: 0.35, 96: 0 };
+
+  /* standard tiers get a gentler curve: the top OVR of a window gains most */
+  (function () {
+    var windows = [
+      { lo: 60, hi: 69, top: 0.60 },
+      { lo: 72, hi: 79, top: 0.55 },
+      { lo: 80, hi: 88, top: 0.90 }
+    ];
+    windows.forEach(function (w) {
+      for (var o = w.lo; o <= w.hi; o++) {
+        var t = (o - w.lo) / (w.hi - w.lo);
+        /* only the upper half of a window benefits from luck */
+        LUCK_GAIN[o] = t < 0.5 ? 0 : w.top * ((t - 0.5) / 0.5);
+      }
+    });
+  })();
   var PITY_98 = 60;    // cards without a 98+ before one is forced
   var PITY_99 = 900;   // cards without a 99 before one is forced
 
@@ -148,7 +218,7 @@
       out[t] = w;
       sum += w;
     }
-    /* 96 soaks up whatever the boosted tiers took, so the table stays at 100 */
+    /* the floor tier soaks up what the boosted tiers took: table stays at 100 */
     for (i = 0; i < tiers.length; i++) {
       t = tiers[i];
       out[t] = out[t] / sum * 100;
@@ -202,6 +272,9 @@
 
     if (pack.guaranteed) {
       ovr = pack.guaranteed;
+    } else if (pack.std) {
+      /* standard packs stay inside their own OVR window — no legend pity */
+      ovr = pickTier(pack, luck);
     } else if (st && st.pity99 >= PITY_99) {
       ovr = 99;
     } else if (st && st.pity98 >= PITY_98 && pack.table[98] !== undefined) {
@@ -238,30 +311,36 @@
       var ovr = c.ovr || 99;
       var reg = EC.add(c);
 
-      /* pity + dry bookkeeping */
-      st.pity99 = ovr >= 99 ? 0 : st.pity99 + 1;
-      st.pity98 = ovr >= 98 ? 0 : st.pity98 + 1;
+      /* pity bookkeeping: standard pulls must not feed the legend counters */
+      if (!pack.std) {
+        st.pity99 = ovr >= 99 ? 0 : st.pity99 + 1;
+        st.pity98 = ovr >= 98 ? 0 : st.pity98 + 1;
+      }
 
       if (ovr > best) { best = ovr; }
       pulls.push({ card: c, isNew: reg.isNew, copies: reg.count,
                    sell: EC.sellValue(c) });
     }
 
-    /* dry streak: mercy luck grows while no 98+ shows up */
-    st.dry = best >= 98 ? 0 : st.dry + x;
+    /* dry streak: mercy luck grows while no 98+ shows up (legend packs only) */
+    if (!pack.std) { st.dry = best >= 98 ? 0 : st.dry + x; }
     if (st.charm > 0) { st.charm = Math.max(0, st.charm - x); }
 
     st.opened += x;
-    st.xp += 40 * x + (best >= 99 ? 600 : best >= 98 ? 150 : 0);
+    st.xp += (pack.std ? 12 : 40) * x
+      + (best >= 99 ? 600 : best >= 98 ? 150 : 0);
     while (st.xp >= 15000) { st.xp -= 15000; st.level += 1; }
 
     /* every pack refunds a little: gems on a 98+, coins on the filler cards */
     var bonus = { coins: 0, gems: 0 };
     for (i = 0; i < pulls.length; i++) {
       var o = pulls[i].card.ovr || 99;
-      if (o >= 99) { bonus.gems += 25; }
-      else if (o >= 98) { bonus.gems += 5; }
-      else { bonus.coins += 1200; }
+      if (o >= 99) { bonus.gems += 250; }
+      else if (o >= 98) { bonus.gems += 50; }
+      else if (o >= 96) { bonus.coins += 12000; }
+      else if (o >= 80) { bonus.coins += 4000; }
+      else if (o >= 72) { bonus.coins += 1200; }
+      else { bonus.coins += 300; }
     }
     EC.earn(bonus);
 
@@ -278,7 +357,7 @@
   }
 
   /* -------------------------------------------------------- luck charm ---- */
-  var CHARM = { cost: { gems: 150 }, packs: 10 };
+  var CHARM = { cost: { gems: 1500 }, packs: 10 };
 
   function buyCharm() {
     if (!EC.canPay(CHARM.cost)) { return false; }
@@ -292,12 +371,12 @@
    * Coins have to come from somewhere, otherwise the store is decoration.
    */
   var INCOME = {
-    play:        { coins: 85000,  gems: 0,  label: "QUICK MATCH WON" },
-    ai:          { coins: 140000, gems: 2,  label: "AI MATCH · LEGENDARY" },
-    draft:       { coins: 260000, gems: 6,  label: "DRAFT RUN FINISHED" },
-    missions:    { coins: 180000, gems: 8,  label: "DAILY MISSIONS CLAIMED" },
-    rewards:     { coins: 320000, gems: 15, label: "REWARDS CLAIMED" },
-    tournaments: { coins: 550000, gems: 25, label: "TOURNAMENT PAYOUT" }
+    play:        { coins: 850000,  gems: 0,   label: "QUICK MATCH WON" },
+    ai:          { coins: 1400000, gems: 20,  label: "AI MATCH · LEGENDARY" },
+    draft:       { coins: 2600000, gems: 60,  label: "DRAFT RUN FINISHED" },
+    missions:    { coins: 1800000, gems: 80,  label: "DAILY MISSIONS CLAIMED" },
+    rewards:     { coins: 3200000, gems: 150, label: "REWARDS CLAIMED" },
+    tournaments: { coins: 5500000, gems: 250, label: "TOURNAMENT PAYOUT" }
   };
 
   function claim(key) {
