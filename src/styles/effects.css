@@ -133,7 +133,7 @@
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 2.5%;
+  gap: .5em;
 }
 
 .screen__row {

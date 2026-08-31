@@ -8,7 +8,7 @@
 .cardgrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 4%;
+  gap: .7em;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -311,12 +311,12 @@
 }
 
 /* ---------- detail sheet ---------- */
-.cdetail { display: grid; gap: 4%; }
+.cdetail { display: grid; gap: .7em; }
 
 .cdetail__top {
   display: grid;
   grid-template-columns: 38% 1fr;
-  gap: 5%;
+  gap: .9em;
   align-items: start;
 }
 
@@ -354,7 +354,7 @@
 .mainstats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 3%;
+  gap: .55em;
   margin: 0; padding: 0;
   list-style: none;
 }
@@ -378,7 +378,7 @@
 .substats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2.5% 5%;
+  gap: .5em .9em;
   margin: 0; padding: 0;
   list-style: none;
 }
@@ -421,7 +421,7 @@
 .packstage {
   display: grid;
   place-items: center;
-  gap: 4%;
+  gap: .7em;
   padding: 2% 0;
 }
 
@@ -456,13 +456,13 @@
 }
 
 /* ---------- market / list rows with a mini card ---------- */
-.mktlist { display: grid; gap: 3%; margin: 0; padding: 0; list-style: none; }
+.mktlist { display: grid; gap: .55em; margin: 0; padding: 0; list-style: none; }
 
 .mktrow {
   display: grid;
   grid-template-columns: 13% 1fr auto;
   align-items: center;
-  gap: 4%;
+  gap: .7em;
   padding: .55em .8em;
   border-radius: var(--r-sm);
   background: rgba(255, 255, 255, .05);

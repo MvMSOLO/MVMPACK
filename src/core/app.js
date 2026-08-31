@@ -5,6 +5,9 @@
   var data = window.MVM_DATA || { screens: {}, toasts: {} };
   var DB = window.MVM_CARDS || null;
   var UI = window.MVM_UI || null;
+  var EC = window.MVM_ECON || null;
+  var PK = window.MVM_PACKS || null;
+  var PUI = UI && UI.packs ? UI.packs : null;
   var stage = document.getElementById("stage");
   var screenEl = document.getElementById("screen");
   var screenTitle = document.getElementById("screenTitle");
@@ -13,6 +16,9 @@
   var toastEl = document.getElementById("toast");
   var lastFocus = null;
   var toastTimer = null;
+  var lastResult = null;
+  var hudCoins = document.getElementById("hudCoins");
+  var hudGems = document.getElementById("hudGems");
 
   function showToast(text) {
     toastEl.textContent = text;
@@ -21,6 +27,37 @@
     toastTimer = setTimeout(function () {
       toastEl.classList.remove("is-open");
     }, 1800);
+  }
+
+  /* ---------------------------------------------------------------- HUD ---
+   * The header artwork carries a coins / gems read-out; keep it in sync with
+   * the wallet and bump it whenever a value actually changes.
+   */
+  function bump(el, text) {
+    if (!el || el.textContent === text) { return; }
+    el.textContent = text;
+    el.classList.remove("is-bump");
+    /* force a reflow so the animation restarts on every change */
+    void el.offsetWidth;
+    el.classList.add("is-bump");
+  }
+
+  function syncHud() {
+    if (!EC) { return; }
+    bump(hudCoins, EC.short(EC.coins()));
+    bump(hudGems, EC.short(EC.gems()));
+  }
+
+  if (EC) { EC.onChange(syncHud); }
+
+  /* jackpot flash for a 99 OVR pull */
+  function flash() {
+    var fx = document.createElement("div");
+    fx.className = "flash";
+    document.body.appendChild(fx);
+    setTimeout(function () {
+      if (fx.parentNode) { fx.parentNode.removeChild(fx); }
+    }, 950);
   }
 
   function paint(conf) {
@@ -58,6 +95,52 @@
     screenClose.focus();
   }
 
+  /* --------------------------------------------------- pack transactions --
+   * Buying is the only way cards enter the collection, so the wallet check,
+   * the roll and the result screen all live behind this one entry point.
+   */
+  function bestToast(res) {
+    if (res.best >= 99) { return "99 OVR PULLED \u2014 ABSOLUTE CINEMA"; }
+    if (res.best >= 98) { return "98 OVR PULLED \u2014 MASSIVE"; }
+    if (res.best >= 97) { return "97 OVR PULLED \u2014 SOLID HIT"; }
+    return "PACK OPENED \u00b7 NO 97+ THIS TIME";
+  }
+
+  function openPack(id) {
+    var pack = PK.get(id);
+    if (!pack) { return; }
+
+    var res = PK.open(pack, PUI.getMulti());
+    if (!res.ok) {
+      showToast(res.reason === "funds"
+        ? "NOT ENOUGH \u00b7 " + PUI.money(res.cost) + " NEEDED"
+        : "PACK UNAVAILABLE");
+      return;
+    }
+
+    lastResult = res;
+    paint(PUI.result(res));
+    if (!screenEl.classList.contains("is-open")) {
+      lastFocus = document.activeElement;
+      screenEl.classList.add("is-open");
+      screenEl.setAttribute("aria-hidden", "false");
+    }
+    if (res.best >= 99) { flash(); }
+    showToast(bestToast(res));
+  }
+
+  function quickSell() {
+    var got = 0, i;
+    for (i = 0; i < lastResult.pulls.length; i++) {
+      var p = lastResult.pulls[i];
+      if (!p.isNew) { got += EC.sell(p.card.id, 1); }
+    }
+    lastResult = null;
+    showToast(got > 0 ? "DUPES SOLD \u00b7 +" + EC.short(got) + " \u25c9"
+                      : "NOTHING LEFT TO SELL");
+    openScreen("store");
+  }
+
   function closeScreen() {
     screenEl.classList.remove("is-open");
     screenEl.setAttribute("aria-hidden", "true");
@@ -88,6 +171,53 @@
   screenBody.addEventListener("click", function (ev) {
     var row = ev.target.closest("[data-open]");
     if (row) { openCard(row.getAttribute("data-open")); return; }
+
+    /* ---- pack store: pick a multiplier ---------------------------------- */
+    var multi = ev.target.closest("[data-multi]");
+    if (multi && PUI) {
+      PUI.setMulti(parseInt(multi.getAttribute("data-multi"), 10) || 1);
+      openScreen("store");
+      return;
+    }
+
+    /* ---- buy + open a pack --------------------------------------------- */
+    var packBtn = ev.target.closest("[data-pack]");
+    if (packBtn && PK && PUI) {
+      openPack(packBtn.getAttribute("data-pack"));
+      return;
+    }
+
+    /* ---- quick sell every duplicate from the last opening --------------- */
+    if (ev.target.closest("[data-quicksell]") && EC && lastResult) {
+      quickSell();
+      return;
+    }
+
+    /* ---- luck charm ----------------------------------------------------- */
+    if (ev.target.closest("[data-charm]") && PK) {
+      if (PK.buyCharm()) {
+        showToast("LUCK CHARM ACTIVE \u00b7 " + PK.charm.packs + " PACKS");
+      } else {
+        showToast("NOT ENOUGH GEMS FOR THE CHARM");
+      }
+      openScreen("store");
+      return;
+    }
+
+    /* ---- claim an income source ---------------------------------------- */
+    var claimBtn = ev.target.closest("[data-claim]");
+    if (claimBtn && PK) {
+      var src = PK.claim(claimBtn.getAttribute("data-claim"));
+      if (src) {
+        showToast(src.label + " \u00b7 +" + EC.short(src.coins) + " \u25c9");
+      }
+      openScreen("earn");
+      return;
+    }
+
+    /* ---- jump between overlay screens ---------------------------------- */
+    var jump = ev.target.closest("[data-screen]");
+    if (jump) { openScreen(jump.getAttribute("data-screen")); return; }
 
     if (ev.target.closest("[data-pull]") && DB && UI) {
       var pulled = DB.random();
