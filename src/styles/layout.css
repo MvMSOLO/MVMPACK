@@ -1,0 +1,95 @@
+/* MVMPACK 26 - layout: keeps the exact 1024x1536 proportions of the mockup */
+.app {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* soft ambient backdrop so letterboxed areas on tall phones feel intentional */
+.app::before {
+  content: "";
+  position: fixed;
+  inset: -8%;
+  background: url("../../assets/sections/hero.png") center / cover no-repeat;
+  filter: blur(70px) saturate(1.3) brightness(.42);
+  opacity: .55;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* The stage always keeps the 2:3 ratio of the reference artwork, so every
+   section slice lines up exactly like in the original mockup. */
+.stage {
+  position: relative;
+  z-index: 1;
+  width: min(100vw, calc(100svh * 1024 / 1536), 1024px);
+  aspect-ratio: 1024 / 1536;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  border-radius: clamp(0px, 1.6vw, 22px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .05),
+              0 30px 90px rgba(0, 0, 0, .75);
+  /* text/vector overlays scale with the stage */
+  font-size: calc(100% * 1);
+}
+
+/* Each section keeps the height share it has in the source image. */
+.sec {
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: 100% 100%;
+}
+
+.sec--header  { height: calc(104 / 1536 * 100%); }
+.sec--hero    { height: calc(396 / 1536 * 100%); }
+.sec--row1    { height: calc(306 / 1536 * 100%); }
+.sec--row2    { height: calc(214 / 1536 * 100%); }
+.sec--squares { height: calc(176 / 1536 * 100%); }
+.sec--promo   { height: calc(200 / 1536 * 100%); }
+.sec--nav     { height: calc(140 / 1536 * 100%); }
+
+/* Interactive hotspots sit on top of the artwork, positioned in percentages
+   measured from the reference so they follow the art at any screen size. */
+.hs {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+  border-radius: var(--r-md);
+  background: transparent;
+  transition: transform .18s var(--ease), box-shadow .18s var(--ease),
+              background-color .18s var(--ease);
+}
+
+.hs--tile { border-radius: var(--r-lg); }
+.hs--sq   { border-radius: var(--r-md); }
+.hs--nav  { border-radius: 14px; }
+.hs--orb  { border-radius: 50%; }
+.hs--cta  { border-radius: 999px; }
+
+@media (hover: hover) {
+  .hs:hover { background: rgba(255, 255, 255, .06); }
+  .hs--tile:hover { transform: translateY(-.4%) scale(1.012); }
+  .hs--sq:hover   { transform: translateY(-1.5%) scale(1.02); }
+  .hs--cta:hover  { background: rgba(255, 255, 255, .18); }
+  .hs--orb:hover  { transform: scale(1.06); }
+}
+
+.hs:active { transform: scale(.975); }
+.hs--orb:active { transform: scale(.94); }
+
+/* landscape / desktop: give the phone some breathing room */
+@media (min-aspect-ratio: 3/4) {
+  .app { padding: 12px 0; }
+}

@@ -1,0 +1,179 @@
+/* MVMPACK 26 - glow, sheen, overlay screens, toast */
+
+/* diagonal light sweep over hero & promo, like the neon mockup energy */
+.sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: screen;
+  opacity: .5;
+}
+
+.sheen::before {
+  content: "";
+  position: absolute;
+  top: -30%;
+  left: -40%;
+  width: 28%;
+  height: 160%;
+  background: linear-gradient(90deg,
+    transparent, rgba(255, 255, 255, .16), transparent);
+  transform: rotate(14deg);
+  animation: sweep 6.5s var(--ease) infinite;
+}
+
+.sheen--slow::before { animation-duration: 9s; }
+
+@keyframes sweep {
+  0%       { left: -40%; }
+  55%, 100% { left: 130%; }
+}
+
+/* pressed tiles get a matching neon rim */
+.hs--tile:active { box-shadow: inset 0 0 0 2px rgba(0, 242, 255, .55); }
+.hs--sq:active   { box-shadow: inset 0 0 0 2px rgba(255, 204, 0, .55); }
+
+.hs--orb {
+  animation: orb 3.4s ease-in-out infinite;
+}
+
+@keyframes orb {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 242, 255, .00); }
+  50%      { box-shadow: 0 0 28px 6px rgba(0, 242, 255, .28); }
+}
+
+/* ---------- overlay screen ---------- */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 4%;
+  background: rgba(2, 5, 12, .72);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .22s var(--ease), visibility .22s;
+  z-index: 20;
+}
+
+.screen.is-open { opacity: 1; visibility: visible; }
+
+.screen__panel {
+  width: 100%;
+  max-width: 92%;
+  max-height: 86%;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-lg);
+  background: linear-gradient(160deg, #0a1122 0%, #060b16 100%);
+  border: 1px solid rgba(0, 242, 255, .25);
+  box-shadow: 0 0 60px rgba(0, 242, 255, .18),
+              0 24px 60px rgba(0, 0, 0, .6);
+  transform: translateY(14px) scale(.98);
+  transition: transform .24s var(--ease);
+  overflow: hidden;
+}
+
+.screen.is-open .screen__panel { transform: none; }
+
+.screen__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3.4% 4%;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  background: linear-gradient(90deg,
+    rgba(255, 204, 0, .12), rgba(176, 38, 255, .12));
+}
+
+.screen__title {
+  margin: 0;
+  font-size: clamp(15px, 3.4vw, 26px);
+  letter-spacing: .06em;
+  font-weight: 800;
+  color: var(--gold);
+  text-shadow: 0 0 18px rgba(255, 204, 0, .45);
+}
+
+.screen__close {
+  width: 2em;
+  height: 2em;
+  display: grid;
+  place-items: center;
+  font-size: clamp(14px, 3vw, 22px);
+  line-height: 1;
+  border-radius: 50%;
+  color: var(--white);
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .16);
+}
+
+.screen__close:hover { background: rgba(255, 45, 85, .35); }
+
+.screen__body {
+  padding: 4%;
+  overflow-y: auto;
+  font-size: clamp(11px, 2.4vw, 17px);
+  line-height: 1.55;
+  color: #dfe8f6;
+}
+
+.screen__body h3 {
+  margin: 0 0 .6em;
+  font-size: 1.1em;
+  color: var(--cyan);
+  letter-spacing: .04em;
+}
+
+.screen__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2.5%;
+}
+
+.screen__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: .7em .9em;
+  border-radius: var(--r-sm);
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .08);
+}
+
+.screen__row b { color: var(--white); }
+.screen__row span { color: var(--gold-soft); font-variant-numeric: tabular-nums; }
+
+/* ---------- toast ---------- */
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 12.5%;
+  transform: translate(-50%, 16px);
+  max-width: 84%;
+  padding: .7em 1.2em;
+  border-radius: 999px;
+  font-size: clamp(11px, 2.3vw, 16px);
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: #05121a;
+  background: linear-gradient(90deg, var(--gold), #ffe98a);
+  box-shadow: 0 0 30px rgba(255, 204, 0, .45);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .2s var(--ease), transform .2s var(--ease), visibility .2s;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.toast.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}

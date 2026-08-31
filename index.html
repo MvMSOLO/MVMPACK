@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#050a14" />
+<title>MVMPACK 26</title>
+<link rel="preload" as="image" href="assets/sections/hero.png" />
+<link rel="stylesheet" href="src/styles/base.css" />
+<link rel="stylesheet" href="src/styles/layout.css" />
+<link rel="stylesheet" href="src/styles/sections.css" />
+<link rel="stylesheet" href="src/styles/effects.css" />
+</head>
+<body>
+<div class="app" id="app">
+  <div class="stage" id="stage">
+
+    <!-- ============ HEADER ============ -->
+    <header class="sec sec--header" data-h="104">
+      <button class="hs" data-act="profile" style="--x:2.6%;--y:9%;--w:24%;--h:82%" aria-label="Profile: GOAT_UZB, level 42"></button>
+      <button class="hs" data-act="coins" style="--x:34.5%;--y:20%;--w:14%;--h:60%" aria-label="Coins 4.2B, add"></button>
+      <button class="hs" data-act="gems" style="--x:50%;--y:20%;--w:14%;--h:60%" aria-label="Gems 18.6K, add"></button>
+      <button class="hs" data-act="energy" style="--x:65.5%;--y:20%;--w:16%;--h:60%" aria-label="Energy 320 of 320, add"></button>
+      <button class="hs" data-act="mail" style="--x:83%;--y:24%;--w:5.4%;--h:52%" aria-label="Messages"></button>
+      <button class="hs" data-act="leaderboard" style="--x:88.7%;--y:24%;--w:5.4%;--h:52%" aria-label="Leaderboard"></button>
+      <button class="hs" data-act="settings" style="--x:94.2%;--y:24%;--w:5.4%;--h:52%" aria-label="Settings"></button>
+    </header>
+
+    <!-- ============ HERO ============ -->
+    <section class="sec sec--hero" data-h="396" aria-label="MVMPACK 26 - Legends never die - new event">
+      <span class="sheen" aria-hidden="true"></span>
+      <button class="hs hs--cta" data-act="event" style="--x:5%;--y:64%;--w:34%;--h:15%" aria-label="New event: Ronaldo Legend"></button>
+    </section>
+
+    <!-- ============ ROW 1 : PACK OPENING / DRAFT ============ -->
+    <section class="sec sec--row1" data-h="306" aria-label="Pack opening and draft">
+      <button class="hs hs--tile" data-act="pack" style="--x:2.6%;--y:4%;--w:53.4%;--h:92%" aria-label="Pack opening - the best feeling in the game"></button>
+      <button class="hs hs--tile" data-act="draft" style="--x:58.7%;--y:4%;--w:38.7%;--h:92%" aria-label="Draft - build your dream team"></button>
+    </section>
+
+    <!-- ============ ROW 2 : AI MATCH / SQUAD BUILDER ============ -->
+    <section class="sec sec--row2" data-h="214" aria-label="AI match and squad builder">
+      <button class="hs hs--tile" data-act="ai" style="--x:2.6%;--y:4.5%;--w:45.9%;--h:91%" aria-label="AI match - test your skills"></button>
+      <button class="hs hs--tile" data-act="squad" style="--x:50.9%;--y:4.5%;--w:46.5%;--h:91%" aria-label="Squad builder - create, upgrade, dominate"></button>
+    </section>
+
+    <!-- ============ SQUARES ============ -->
+    <section class="sec sec--squares" data-h="176" aria-label="Market, missions, rewards, tournaments">
+      <button class="hs hs--sq" data-act="market" style="--x:2.8%;--y:5.7%;--w:23%;--h:89.8%" aria-label="Market - buy, sell, trade. New"></button>
+      <button class="hs hs--sq" data-act="missions" style="--x:28%;--y:5.7%;--w:20.6%;--h:89.8%" aria-label="Missions - daily and seasonal. 3 available"></button>
+      <button class="hs hs--sq" data-act="rewards" style="--x:50.8%;--y:5.7%;--w:23.1%;--h:89.8%" aria-label="Rewards - claim your gifts. 1 available"></button>
+      <button class="hs hs--sq" data-act="tournaments" style="--x:73.9%;--y:5.7%;--w:22.8%;--h:89.8%" aria-label="Tournaments - global ranks"></button>
+    </section>
+
+    <!-- ============ PROMO ============ -->
+    <section class="sec sec--promo" data-h="200" aria-label="Legend pack promo - Siuuui mode on">
+      <span class="sheen sheen--slow" aria-hidden="true"></span>
+      <button class="hs hs--cta" data-act="open-pack" style="--x:74%;--y:57%;--w:22%;--h:20%" aria-label="Open legend pack now"></button>
+    </section>
+
+    <!-- ============ NAV ============ -->
+    <nav class="sec sec--nav" data-h="140" aria-label="Main navigation">
+      <button class="hs hs--nav is-active" data-act="home" style="--x:8%;--y:20%;--w:16%;--h:62%" aria-label="Home"></button>
+      <button class="hs hs--nav" data-act="club" style="--x:26.5%;--y:20%;--w:16%;--h:62%" aria-label="My club"></button>
+      <button class="hs hs--orb" data-act="play" style="--x:43.6%;--y:9%;--w:12.9%;--h:72%" aria-label="Quick play"></button>
+      <button class="hs hs--nav" data-act="transfers" style="--x:57.5%;--y:20%;--w:17%;--h:62%" aria-label="Transfers"></button>
+      <button class="hs hs--nav" data-act="store" style="--x:76.5%;--y:20%;--w:16%;--h:62%" aria-label="Store, new items"></button>
+    </nav>
+
+  </div>
+
+  <!-- screen overlay -->
+  <div class="screen" id="screen" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="screen__panel">
+      <div class="screen__bar">
+        <h2 class="screen__title" id="screenTitle">MVMPACK</h2>
+        <button class="screen__close" id="screenClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="screen__body" id="screenBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script src="src/core/data.js"></script>
+<script src="src/core/app.js"></script>
+</body>
+</html>
