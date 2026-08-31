@@ -41,10 +41,20 @@
     noventa: 1, captain: 1, guardian: 1, superman: 1
   };
 
+  /* and every Meme Icon owns his own one too (memefx.css) */
+  var MEME_ANIMS = {
+    rizz: 1, sigma: 1, gigachad: 1, aura: 1, delulu: 1, goated: 1,
+    sheesh: 1, npc: 1, bussin: 1, skibidi: 1, gyatt: 1, cooked: 1,
+    mogged: 1, siuupink: 1, cap: 1, mid: 1
+  };
+
   function animClass(c) {
     if (!c.anim) { return ""; }
     if (c.type === "cl") {
       return CL_ANIMS[c.anim] ? " clfx clfx--" + c.anim : "";
+    }
+    if (c.type === "meme") {
+      return MEME_ANIMS[c.anim] ? " memefx memefx--" + c.anim : "";
     }
     return ANIMS[c.anim] ? " wcfx wcfx--" + c.anim : "";
   }
@@ -60,6 +70,8 @@
     var cls = "mvm-card" +
       (c.type === "wc" ? " mvm-card--wc" : "") +
       (c.type === "cl" ? " mvm-card--cl" : "") +
+      (c.type === "meme" ? " mvm-card--meme" : "") +
+      (c.type === "meme" && c.tier ? " is-tier-" + c.tier.toLowerCase() : "") +
       animClass(c) +
       (opts.flipped ? " is-flipped" : "") +
       (opts.reveal ? " pack-reveal" : "");
@@ -89,6 +101,7 @@
               '<span class="mvm-back__mono">' +
                 (c.type === "wc" ? "WORLD CUP HEROES"
                   : c.type === "cl" ? "CHAMPIONS LEAGUE LEGENDS"
+                  : c.type === "meme" ? "MEME ICONS"
                   : "MVMPACK 26") + '</span>' +
               '<span class="mvm-back__crest">' + esc(c.flag) + '</span>' +
               '<span class="mvm-back__theme">' + esc(b.theme) + '</span>' +
@@ -235,14 +248,22 @@
   }
 
   function packStage(c, revealed) {
+    var pool = esc(DB.count) + " cards in the pool \u2014 " +
+      ((DB.icons || DB.all).length) + " icons at 99, " +
+      ((DB.wc || []).length) + " World Cup heroes at 98, " +
+      ((DB.cl || []).length) + " Champions League legends at 97 and " +
+      ((DB.meme || []).length) + " Meme Icons at 98 / 96";
+
     return '<div class="packstage">' +
       cardMarkup(c, { flipped: !revealed, reveal: revealed }) +
       '<p class="hint">' +
         (revealed ? esc(c.name) + " \u2014 " + esc(c.ovr || 99) + " " + esc(c.pos) +
-                    " &middot; " + esc(c.back.serial)
-                  : esc(DB.count) + " cards in the pool \u2014 21 icons at 99, " +
-                    "18 World Cup heroes at 98 and 28 Champions League " +
-                    "legends at 97") +
+                    " &middot; " + esc(c.back.serial) +
+                    (c.type === "meme"
+                      ? " &middot; " + esc(c.rarity) +
+                        (c.tier === "A" ? " \u2014 absolute cinema" : " \u2014 no cap")
+                      : "")
+                  : pool) +
       "</p>" +
       '<button type="button" class="btn" data-pull="1">' +
         (revealed ? "OPEN ANOTHER" : "OPEN PACK") + "</button>" +
@@ -274,6 +295,8 @@
         var icons = DB.icons || DB.all;
         var wc = DB.wc || [];
         var cl = DB.cl || [];
+        var ma = DB.memeA || [];
+        var mb = DB.memeB || [];
         return {
           title: "MY CLUB \u00b7 " + DB.count + " CARDS",
           html: "<h3>Icons \u2014 " + icons.length + " cards at 99 OVR</h3>" +
@@ -290,6 +313,18 @@
                     cl.length + " cards at 97 OVR</h3>" +
                     '<p class="hint">Kings of Europe \u2014 each legend flips to ' +
                     "his own starball back.</p>" + grid(cl)
+                  : "") +
+                (ma.length
+                  ? '<h3 class="memesec__title">Meme Icons \u00b7 Prime \u2014 ' +
+                    ma.length + " cards at 98 OVR</h3>" +
+                    '<p class="hint">The hard pulls \u2014 rizz, sigma and ' +
+                    "gigachad energy only.</p>" + grid(ma)
+                  : "") +
+                (mb.length
+                  ? '<h3 class="memesec__title memesec__title--b">Meme Icons \u2014 ' +
+                    mb.length + " cards at 96 OVR</h3>" +
+                    '<p class="hint">The easy pulls \u2014 still bussin.</p>' +
+                    grid(mb)
                   : "")
         };
       },
@@ -347,6 +382,20 @@
                 '<p class="hint">Every legend has his own signature animation ' +
                 "and his own full stat sheet \u2014 tap to flip.</p>" +
                 grid(cl)
+        };
+      },
+      meme: function () {
+        var ma = DB.memeA || [];
+        var mb = DB.memeB || [];
+        return {
+          title: "MEME ICONS",
+          html: "<h3>" + (ma.length + mb.length) + " meme cards \u00b7 98 / 96 OVR</h3>" +
+                '<p class="hint">Prime Meme cards are the rare ones \u2014 low pull ' +
+                "rate, higher stats. Every card animates its own way.</p>" +
+                '<h4 class="sec-title">Prime Meme \u00b7 98 OVR \u00b7 hard pull</h4>' +
+                grid(ma) +
+                '<h4 class="sec-title">Meme Icon \u00b7 96 OVR \u00b7 easy pull</h4>' +
+                grid(mb)
         };
       }
     }

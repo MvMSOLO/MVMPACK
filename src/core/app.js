@@ -94,6 +94,9 @@
       paint({ title: "LEGEND PACK", html: UI.packStage(pulled, true) });
       showToast(pulled.type === "wc" ? "WORLD CUP HERO PULLED"
         : pulled.type === "cl" ? "CHAMPIONS LEAGUE LEGEND PULLED"
+        : pulled.type === "meme"
+          ? (pulled.tier === "A" ? "PRIME MEME PULLED \u2014 ABSOLUTE CINEMA"
+                                 : "MEME ICON PULLED \u2014 NO CAP")
         : "NEW ICON PULLED");
       return;
     }
