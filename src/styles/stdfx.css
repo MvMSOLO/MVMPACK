@@ -1,0 +1,101 @@
+/* Standard (220) card visuals: real frame image + portrait inset + full stats.
+   Frame art is fully opaque (no transparent window), so the portrait is
+   inset on top of the frame inside the flat central area. */
+
+:root{
+  --std-ratio: 0.6051;            /* 501 / 828 */
+  --std-photo-l: 22%;
+  --std-photo-r: 22%;
+  --std-photo-t: 16%;
+  --std-photo-b: 42%;
+}
+
+/* ---------- card shell ---------- */
+.stdc{
+  position:relative;
+  width:100%;
+  aspect-ratio: 501 / 828;
+  border-radius:.6em;
+  overflow:hidden;
+  color:#2a1c05;
+  font-family:inherit;
+  -webkit-user-select:none; user-select:none;
+}
+.stdc .std-frame{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:fill;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* ---------- portrait ---------- */
+.stdc .std-photo{
+  position:absolute;
+  left:var(--std-photo-l); right:var(--std-photo-r);
+  top:var(--std-photo-t); bottom:var(--std-photo-b);
+  z-index:2;
+  object-fit:cover;
+  object-position:50% 12%;
+  -webkit-mask-image:radial-gradient(120% 100% at 50% 40%,#000 62%,transparent 100%);
+  mask-image:radial-gradient(120% 100% at 50% 40%,#000 62%,transparent 100%);
+}
+.stdc .std-photo.is-missing{ display:none; }
+
+/* ---------- top-left OVR / position block ---------- */
+.stdc .std-top{
+  position:absolute; z-index:3;
+  left:6.5%; top:15%;
+  line-height:1;
+  text-align:center;
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+}
+.stdc .std-ovr{ font-weight:900; font-size:1.5em; letter-spacing:-.02em; }
+.stdc .std-pos{ font-weight:700; font-size:.62em; margin-top:.15em; opacity:.85; }
+.stdc .std-league{
+  font-size:.46em; font-weight:600; margin-top:.25em;
+  max-width:4.2em; opacity:.7;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* ---------- name band ---------- */
+.stdc .std-name{
+  position:absolute; z-index:3;
+  left:10%; right:10%; top:59%;
+  text-align:center;
+  font-weight:800; font-size:.78em;
+  text-transform:uppercase;
+  letter-spacing:.01em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+/* ---------- stats grid ---------- */
+.stdc .std-stats{
+  position:absolute; z-index:3;
+  left:12%; right:12%; top:66%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.05em .6em;
+  font-size:.6em; font-weight:700;
+}
+.stdc .std-stats div{
+  display:flex; justify-content:space-between; align-items:baseline;
+  gap:.3em;
+}
+.stdc .std-stats b{ font-weight:900; }
+.stdc .std-stats span{ opacity:.72; font-weight:600; }
+
+/* tier tints (frame art already carries the colour, this only tunes text) */
+.stdc.t-gold{ color:#2c1e04; }
+.stdc.t-silver{ color:#22262b; }
+.stdc.t-bronze{ color:#301c0c; }
+
+/* ---------- compact grid variant ---------- */
+.grid .stdc{ font-size:.9em; }
+.grid .stdc .std-stats{ font-size:.5em; }
+
+/* ---------- big / detail variant ---------- */
+.stdc.big{ font-size:1.6em; }
+@media (max-width:420px){
+  .stdc.big{ font-size:1.25em; }
+}

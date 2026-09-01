@@ -227,18 +227,22 @@
         : pulled.type === "meme"
           ? (pulled.tier === "A" ? "PRIME MEME PULLED \u2014 ABSOLUTE CINEMA"
                                  : "MEME ICON PULLED \u2014 NO CAP")
+        : pulled.type === "std"
+          ? (pulled.tier || "bronze").toUpperCase() + " CARD PULLED \u00b7 " +
+            (pulled.ovr || 60) + " OVR"
         : "NEW ICON PULLED");
       return;
     }
 
-    var card = ev.target.closest(".mvm-card");
-    if (card) { card.classList.toggle("is-flipped"); }
+    /* ---- single tap on a card opens its full stat sheet ----------------- */
+    var card = ev.target.closest(".mvm-card, .stdc");
+    if (card) { openCard(card.getAttribute("data-card")); }
   });
 
-  /* double tap / double click a card to read its full stats */
+  /* double tap / double click still flips the card to show its back art */
   screenBody.addEventListener("dblclick", function (ev) {
     var card = ev.target.closest(".mvm-card");
-    if (card) { openCard(card.getAttribute("data-card")); }
+    if (card) { card.classList.toggle("is-flipped"); }
   });
 
   screenClose.addEventListener("click", closeScreen);

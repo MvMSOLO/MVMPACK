@@ -23,14 +23,14 @@
 (function () {
   "use strict";
 
-  var KEY = "mvm26.economy.v2";
+  var KEY = "mvm26.economy.v3";
 
   /* ---------------------------------------------------------- start pot --
    * Matches the reference mockup: 46,030,068 coins and 4,448 gems.
    */
   var START = {
-    coins: 46030068,
-    gems: 4448,
+    coins: 460300680,
+    gems: 44480,
     level: 42,
     xp: 7824,
     /* collection: { cardId: copies } */
@@ -126,11 +126,25 @@
    * Quick-sell price scales hard with OVR — that is what makes a 99 pull feel
    * like a jackpot even when it is a duplicate.
    */
-  var SELL = { 99: 400000, 98: 40000, 97: 9000, 96: 2500 };
+  var SELL = {
+    /* special sets */
+    99: 4000000, 98: 400000, 97: 90000, 96: 25000,
+    /* standard set — gold 80-88 */
+    88: 14000, 87: 11500, 86: 9200, 85: 7600, 84: 6300, 83: 5300, 82: 4500,
+    81: 3800, 80: 3200,
+    /* standard set — silver 72-79 */
+    79: 2600, 78: 2200, 77: 1900, 76: 1600, 75: 1400, 74: 1200, 73: 1050,
+    72: 920,
+    /* standard set — bronze 60-69 */
+    71: 820, 70: 730, 69: 650, 68: 580, 67: 520, 66: 470, 65: 420, 64: 380,
+    63: 340, 62: 300, 61: 270, 60: 240
+  };
 
   function sellValue(card) {
     if (!card) { return 0; }
     var base = SELL[card.ovr || 99] || 1500;
+    /* standard cards are common by design — no premium, no penalty */
+    if (card.type === "std") { return base; }
     /* Prime Meme (tier A) and icons carry a small collector premium */
     if (card.type === "icon") { base = Math.round(base * 1.15); }
     if (card.type === "meme" && card.tier === "A") { base = Math.round(base * 1.2); }

@@ -183,6 +183,27 @@
 .packcard--red   { --pc1: rgba(255, 45, 85, .32); --pc2: rgba(255, 45, 85, .45); }
 .packcard--icon  { --pc1: rgba(255, 204, 0, .4);  --pc2: rgba(255, 255, 255, .5); }
 
+/* standard-set shelves: metal tints, calmer than the legend packs */
+.packcard--bronze  { --pc1: rgba(205, 127, 50, .3);  --pc2: rgba(205, 127, 50, .44); }
+.packcard--silver  { --pc1: rgba(190, 200, 212, .28); --pc2: rgba(190, 200, 212, .42); }
+.packcard--stdgold { --pc1: rgba(226, 180, 92, .3);  --pc2: rgba(226, 180, 92, .46); }
+
+/* the base set is the grind, not the jackpot: flatter card, no sheen sweep */
+.packcard--std {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .015)),
+    radial-gradient(120% 130% at 100% 0%, var(--pc1), transparent 66%),
+    linear-gradient(180deg, #0a1220, #05090f);
+}
+
+.packcard--std::after { display: none; }
+
+.packcard--std:hover,
+.packcard--std:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--pc1);
+}
+
 .packcard__head {
   display: flex;
   align-items: baseline;
@@ -241,6 +262,39 @@
   border-color: rgba(255, 204, 0, .6);
   box-shadow: 0 0 12px rgba(255, 204, 0, .28);
 }
+
+/* base-set chips, one tint per OVR window */
+.odds--stdgold {
+  color: #e6c076;
+  border-color: rgba(226, 180, 92, .45);
+}
+
+.odds--stdsilver {
+  color: #cdd6e0;
+  border-color: rgba(190, 200, 212, .4);
+}
+
+.odds--stdbronze {
+  color: #d59a63;
+  border-color: rgba(205, 127, 50, .42);
+}
+
+/* the folded "everything else in this window" chip stays visually secondary */
+.odds--rest {
+  opacity: .78;
+  border-style: dashed;
+}
+
+/* shelf headings that split legend packs from the standard set */
+.shelfttl {
+  margin: .9em 0 .1em;
+  font-size: clamp(9px, 2.1vw, 14px);
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.hint--tight { margin: 0 0 .55em; }
 
 /* ---------------------------------------------------------- opening view -- */
 .openhead {
@@ -339,6 +393,31 @@
 @keyframes jackpotPulse {
   0%, 100% { opacity: .45; }
   50%      { opacity: 1; }
+}
+
+/* top end of the base set: a steady halo, no pulse — an 88 is a good pull,
+   not a jackpot, and the standard cards stay animation-free */
+.pullcell--88::before,
+.pullcell--87::before,
+.pullcell--86::before,
+.pullcell--85::before,
+.pullcell--84::before,
+.pullcell--83::before,
+.pullcell--82::before,
+.pullcell--81::before,
+.pullcell--80::before {
+  content: "";
+  position: absolute;
+  inset: -6% -6% 18%;
+  border-radius: var(--r-md);
+  pointer-events: none;
+  box-shadow: 0 0 18px 2px rgba(226, 180, 92, .3);
+}
+
+.pullcell--88::before,
+.pullcell--87::before,
+.pullcell--86::before {
+  box-shadow: 0 0 22px 3px rgba(226, 180, 92, .45);
 }
 
 /* jackpot screen flash for a 99 pull */
