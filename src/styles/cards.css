@@ -44,8 +44,8 @@
   inset: 0;
   transform-style: preserve-3d;
   transition: transform .62s var(--ease);
-  border-radius: 7%;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .55));
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 .mvm-card.is-flipped .mvm-card__inner { transform: rotateY(180deg); }
@@ -53,10 +53,11 @@
 .mvm-card__face {
   position: absolute;
   inset: 0;
-  border-radius: 7%;
+  border-radius: 12px;
   overflow: hidden;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  background: #0d131d;
 }
 
 .mvm-card__face--back { transform: rotateY(180deg); }
@@ -122,14 +123,15 @@
   display: flex;
   align-items: center;
   gap: .35em;
-  padding: .2em .5em;
+  padding: .25em .6em;
   border-radius: 999px;
-  font-size: clamp(6px, 1.35vw, 10px);
-  font-weight: 800;
+  font-size: clamp(8px, 1.5vw, 12px);
+  font-weight: 900;
   letter-spacing: .08em;
   color: #05121a;
   background: linear-gradient(90deg, var(--c1), var(--c2));
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 /* ================= CARD BACK — unique per card ================= */

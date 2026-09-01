@@ -13,13 +13,20 @@
 /* ---------- card shell ---------- */
 .stdc{
   position:relative;
+  display:block;
   width:100%;
   aspect-ratio: 501 / 828;
-  border-radius:.6em;
+  border-radius:12px;
   overflow:hidden;
-  color:#2a1c05;
+  color:#f0f4f8;
   font-family:inherit;
   -webkit-user-select:none; user-select:none;
+  background: linear-gradient(165deg, #121926 0%, #080d14 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
 }
 .stdc .std-frame{
   position:absolute; inset:0;
@@ -45,38 +52,45 @@
 /* ---------- top-left OVR / position block ---------- */
 .stdc .std-top{
   position:absolute; z-index:3;
-  left:6.5%; top:15%;
+  left:6.5%; top:12%;
   line-height:1;
   text-align:center;
-  text-shadow:0 1px 0 rgba(255,255,255,.35);
+  text-shadow:0 2px 4px rgba(0,0,0,0.9);
 }
-.stdc .std-ovr{ font-weight:900; font-size:1.5em; letter-spacing:-.02em; }
-.stdc .std-pos{ font-weight:700; font-size:.62em; margin-top:.15em; opacity:.85; }
+.stdc .std-ovr{ font-weight:900; font-size:1.6em; letter-spacing:-.02em; color: #fff; display: block; }
+.stdc .std-pos{ font-weight:800; font-size:.72em; margin-top:.2em; color: var(--gold, #ffcc00); display: block; text-transform: uppercase; }
 .stdc .std-league{
-  font-size:.46em; font-weight:600; margin-top:.25em;
-  max-width:4.2em; opacity:.7;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font-size:.52em; font-weight:700; margin-top:.3em;
+  max-width:4.2em; opacity:.9; color: #fff;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display: block;
 }
 
 /* ---------- name band ---------- */
 .stdc .std-name{
   position:absolute; z-index:3;
-  left:10%; right:10%; top:59%;
+  left:6%; right:6%; top:58%;
   text-align:center;
-  font-weight:800; font-size:.78em;
+  font-weight:900; font-size:.85em;
   text-transform:uppercase;
-  letter-spacing:.01em;
+  letter-spacing:.03em;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+  padding: .2em 0;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
 }
 
 /* ---------- stats grid ---------- */
 .stdc .std-stats{
   position:absolute; z-index:3;
-  left:12%; right:12%; top:66%;
+  left:8%; right:8%; top:67%;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:.05em .6em;
-  font-size:.6em; font-weight:700;
+  gap:.2em .5em;
+  font-size:.65em; font-weight:800;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
 .stdc .std-stats div{
   display:flex; justify-content:space-between; align-items:baseline;
@@ -85,10 +99,19 @@
 .stdc .std-stats b{ font-weight:900; }
 .stdc .std-stats span{ opacity:.72; font-weight:600; }
 
-/* tier tints (frame art already carries the colour, this only tunes text) */
-.stdc.t-gold{ color:#2c1e04; }
-.stdc.t-silver{ color:#22262b; }
-.stdc.t-bronze{ color:#301c0c; }
+/* tier tints */
+.stdc.t-gold{
+  background: linear-gradient(165deg, #2b210a 0%, #110d04 100%);
+  border-color: rgba(255, 204, 0, 0.4);
+}
+.stdc.t-silver{
+  background: linear-gradient(165deg, #1e242d 0%, #0d1117 100%);
+  border-color: rgba(180, 200, 220, 0.4);
+}
+.stdc.t-bronze{
+  background: linear-gradient(165deg, #291a10 0%, #0f0905 100%);
+  border-color: rgba(180, 110, 60, 0.4);
+}
 
 /* ---------- compact grid variant ---------- */
 .grid .stdc{ font-size:.9em; }
@@ -98,4 +121,39 @@
 .stdc.big{ font-size:1.6em; }
 @media (max-width:420px){
   .stdc.big{ font-size:1.25em; }
+}
+
+/* ---------- walkout animation sequence ---------- */
+.walkout-stage {
+  text-align: center;
+  padding: 1.5em 0;
+  animation: walkoutGlow 1.5s ease-in-out infinite alternate;
+}
+
+.walkout-banner {
+  font-size: 2.2em;
+  font-weight: 900;
+  letter-spacing: .08em;
+  color: #ffcc00;
+  text-shadow: 0 0 20px rgba(255, 204, 0, 0.8), 0 0 40px rgba(0, 242, 255, 0.5);
+  margin-bottom: .4em;
+  animation: walkoutPulse 0.8s ease-in-out infinite alternate;
+}
+
+.walkout-meta {
+  font-size: 1.3em;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 1em;
+  text-transform: uppercase;
+}
+
+@keyframes walkoutGlow {
+  0% { filter: drop-shadow(0 0 15px rgba(255, 204, 0, 0.3)); }
+  100% { filter: drop-shadow(0 0 35px rgba(0, 242, 255, 0.7)); }
+}
+
+@keyframes walkoutPulse {
+  0% { transform: scale(0.96); }
+  100% { transform: scale(1.04); }
 }

@@ -23,16 +23,16 @@
 (function () {
   "use strict";
 
-  var KEY = "mvm26.economy.v3";
+  var KEY = "mvm26.economy.v4";
 
   /* ---------------------------------------------------------- start pot --
-   * Matches the reference mockup: 46,030,068 coins and 4,448 gems.
+   * Clean starting state: 0 coins, 0 gems.
    */
   var START = {
-    coins: 460300680,
-    gems: 44480,
-    level: 42,
-    xp: 7824,
+    coins: 0,
+    gems: 0,
+    level: 1,
+    xp: 0,
     /* collection: { cardId: copies } */
     col: {},
     /* luck engine */

@@ -190,9 +190,22 @@
     var dupes = res.pulls.filter(function (p) { return !p.isNew; });
     var dupeCoins = dupes.reduce(function (a, p) { return a + p.sell; }, 0);
 
+    var walkoutHtml = "";
+    if (res.best >= 97 && res.pulls.length > 0) {
+      var topPull = res.pulls.slice().sort(function (a, b) {
+        return (b.card.ovr || 99) - (a.card.ovr || 99);
+      })[0].card;
+
+      walkoutHtml = '<div class="walkout-stage">' +
+        '<div class="walkout-banner">★ WALKOUT ★</div>' +
+        '<div class="walkout-meta">' + esc(topPull.flag) + " · " + esc(topPull.pos) + " · " + esc(topPull.club) + '</div>' +
+        '</div>';
+    }
+
     return {
       title: res.pack.name + " · ×" + res.x,
-      html: '<div class="openhead">' +
+      html: walkoutHtml +
+        '<div class="openhead">' +
           '<span class="openhead__ttl">' + esc(res.pack.name) + "</span>" +
           '<span class="openhead__best">BEST ' + esc(res.best) + " OVR</span>" +
         "</div>" +

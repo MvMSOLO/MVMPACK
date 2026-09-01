@@ -125,7 +125,7 @@
     var tier = c.tier || c.stdTier || "bronze";
     var m = c.main || {};
     var stats = Object.keys(m).map(function (k) {
-      return "<i><b>" + esc(m[k]) + "</b><span>" + esc(k) + "</span></i>";
+      return "<div><b>" + esc(m[k]) + "</b><span>" + esc(k) + "</span></div>";
     }).join("");
 
     return '<button type="button" class="stdc t-' + esc(tier) +
@@ -429,17 +429,38 @@
       squad: function () {
         return {
           title: "SQUAD BUILDER",
-          html: "<h3>4-3-3 \u00b7 chemistry 100</h3>" + pitch() +
-                '<p class="hint">Every slot is filled with a unique icon card.</p>'
+          html: '<div style="display:flex; justify-content:space-around; align-items:center; background:rgba(255,255,255,0.06); padding: .6em; border-radius:8px; margin-bottom:.8em;">' +
+              '<div><b>SQUAD OVR:</b> <span style="color:#ffcc00; font-size:1.2em; font-weight:900;">98</span></div>' +
+              '<div><b>CHEMISTRY:</b> <span style="color:#00f2ff; font-size:1.2em; font-weight:900;">100</span></div>' +
+            '</div>' + pitch() +
+            '<p class="hint" style="margin-top:.8em;">Ultimate Squad active. Tap cards for player attributes.</p>'
         };
       },
       market: function () {
-        var list = DB.all.slice().sort(function (a, b) {
+        var EC = window.MVM_ECON;
+        var list = DB.all.slice(0, 15).sort(function (a, b) {
           return parseFloat(b.price) - parseFloat(a.price);
         });
+
+        var rows = list.map(function (c) {
+          var priceCoins = Math.round((c.ovr || 80) * 15000);
+          var canAfford = EC && EC.coins() >= priceCoins;
+          return '<li><div class="mktrow">' +
+            '<img src="' + esc(c.art) + '" alt="" loading="lazy" style="width: 2.8em;" />' +
+            '<span>' +
+              '<span class="mktrow__name">' + esc(c.flag + " " + c.name) + '</span><br />' +
+              '<span class="mktrow__sub">' + esc(c.ovr || 99) + ' ' + esc(c.pos) + ' &middot; ' + esc(c.club) + '</span>' +
+            '</span>' +
+            '<button type="button" class="btn ' + (canAfford ? "" : "btn--ghost") + '" data-buy-card="' + esc(c.id) + ':' + priceCoins + '">' +
+              esc(EC ? EC.short(priceCoins) : c.price) + ' ◉' +
+            '</button>' +
+          '</div></li>';
+        }).join("");
+
         return {
-          title: "MARKET",
-          html: "<h3>Buy \u00b7 Sell \u00b7 Trade</h3>" + marketRows(list)
+          title: "TRANSFER MARKET",
+          html: '<h3>Live Market Bids</h3>' +
+            '<ul class="mktlist">' + rows + '</ul>'
         };
       },
       transfers: function () {
@@ -456,11 +477,93 @@
         return { title: "LEGEND PACK", html: packStage(DB.random(), false) };
       },
       draft: function () {
+        var DR = window.MVM_DRAFT;
+        if (!DR) {
+          return {
+            title: "DRAFT",
+            html: "<h3>Pick your six</h3>" + grid(sample(6))
+          };
+        }
+
+        if (!DR.state.active) {
+          // Formation selector
+          var formsHtml = DR.FORMATIONS.map(function (f) {
+            return '<button type="button" class="btn btn--ghost" data-draft-form="' + esc(f.id) + '" style="margin: .3em; padding: .8em 1.4em;">' +
+              '<b>' + esc(f.name) + '</b> FORMATION' +
+              '</button>';
+          }).join("");
+
+          return {
+            title: "MADFUT DRAFT 26",
+            html: '<div style="text-align:center; padding: 1em 0;">' +
+              '<h3>CHOOSE FORMATION</h3>' +
+              '<p class="hint">Select tactical layout to build squad chemistry &amp; rating</p>' +
+              '<div style="display:flex; justify-content:center; flex-wrap:wrap; gap: .5em; margin-top: 1.2em;">' +
+                formsHtml +
+              '</div>' +
+              '</div>'
+          };
+        }
+
+        // Active Draft Board
+        var stats = DR.calculateStats();
+        var form = DR.state.formation;
+
+        // Candidate modal view
+        if (DR.state.pickingSlot) {
+          var pickSlot = DR.state.pickingSlot;
+          var candCards = DR.state.candidates.map(function (c) {
+            return '<div style="flex: 1; min-width: 5.5em; max-width: 8em;" data-draft-pick="' + esc(c.id) + '">' +
+              anyCard(c, { tag: true }) +
+              '</div>';
+          }).join("");
+
+          return {
+            title: "SELECT " + esc(pickSlot.pos) + " PICK",
+            html: '<div style="text-align:center; padding: .5em 0;">' +
+              '<p class="hint">Tap a card to select for slot <b>' + esc(pickSlot.pos) + '</b></p>' +
+              '<div style="display:flex; justify-content:center; flex-wrap:wrap; gap: .6em; margin: 1em 0;">' +
+                candCards +
+              '</div>' +
+              '</div>'
+          };
+        }
+
+        // Pitch Slots
+        var slotsHtml = form.slots.map(function (s) {
+          var picked = DR.state.picks[s.id];
+          return '<div class="pitch__slot" style="--x:' + s.x + '%;--y:' + s.y + '%" data-draft-slot="starting:' + esc(s.id) + ':' + esc(s.pos) + '">' +
+            (picked ? anyCard(picked, { tag: true })
+                    : '<button type="button" class="btn btn--ghost" style="width:100%; aspect-ratio:1; border-radius:50%; font-size: 0.8em; font-weight:900; background:rgba(0,242,255,0.15); border: 2px dashed #00f2ff;">' + esc(s.pos) + '</button>') +
+            '</div>';
+        }).join("");
+
+        // Bench Slots
+        var benchHtml = DR.state.bench.map(function (b, idx) {
+          return '<div style="width: 4.5em; display:inline-block; margin: .2em;" data-draft-slot="bench:' + idx + ':SUB">' +
+            (b ? anyCard(b, { tag: true })
+               : '<button type="button" class="btn btn--ghost" style="width:100%; aspect-ratio:1; border-radius:50%; font-size: 0.7em; font-weight:800; background:rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.3);">SUB</button>') +
+            '</div>';
+        }).join("");
+
+        var isComplete = stats.pickedCount >= (form.slots.length + 5);
+
         return {
-          title: "DRAFT",
-          html: "<h3>Pick your six</h3>" + grid(sample(6)) +
-                '<p class="hint">A fresh mix of icons and World Cup heroes ' +
-                "every time you enter.</p>"
+          title: form.name + " DRAFT · RATING " + stats.rating + " · CHEM " + stats.chemistry,
+          html: '<div style="display:flex; justify-content:space-around; align-items:center; background:rgba(255,255,255,0.06); padding: .5em; border-radius:8px; margin-bottom:.8em;">' +
+              '<div><b>RATING:</b> <span style="color:#ffcc00; font-size:1.2em; font-weight:900;">' + stats.rating + '</span></div>' +
+              '<div><b>CHEMISTRY:</b> <span style="color:#00f2ff; font-size:1.2em; font-weight:900;">' + stats.chemistry + '</span></div>' +
+              '<div><b>PICKED:</b> ' + stats.pickedCount + ' / ' + (form.slots.length + 5) + '</div>' +
+            '</div>' +
+            '<div class="pitch" style="margin-bottom: 1em;">' + slotsHtml + '</div>' +
+            '<h4 class="sec-title" style="margin: .5em 0 .2em;">SUBSTITUTES</h4>' +
+            '<div style="text-align:center; overflow-x:auto; white-space:nowrap; margin-bottom: 1em;">' + benchHtml + '</div>' +
+            '<div class="actbar">' +
+              (isComplete
+                ? '<button type="button" class="btn" data-draft-sim="1">PLAY DRAFT MATCH &amp; CLAIM REWARDS</button>'
+                : '') +
+              '<button type="button" class="btn btn--ghost" data-draft-reset="1">RESET DRAFT</button>' +
+            '</div>'
         };
       },
       wc: function () {
