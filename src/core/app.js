@@ -169,6 +169,76 @@
 
   /* ---------- inside the overlay: flip cards, open sheets, pull packs ---- */
   screenBody.addEventListener("click", function (ev) {
+    var DR = window.MVM_DRAFT;
+
+    /* ---- MADFUT Draft interactions ---------------------------------- */
+    var dForm = ev.target.closest("[data-draft-form]");
+    if (dForm && DR) {
+      DR.startDraft(dForm.getAttribute("data-draft-form"));
+      openScreen("draft");
+      return;
+    }
+
+    var dSlot = ev.target.closest("[data-draft-slot]");
+    if (dSlot && DR) {
+      var parts = dSlot.getAttribute("data-draft-slot").split(":");
+      var type = parts[0], id = parts[1], pos = parts[2];
+      DR.state.pickingSlot = { type: type, id: id, pos: pos };
+      DR.generateCandidates(pos);
+      openScreen("draft");
+      return;
+    }
+
+    var dPick = ev.target.closest("[data-draft-pick]");
+    if (dPick && DR && DR.state.pickingSlot) {
+      var cardId = dPick.getAttribute("data-draft-pick");
+      var cardObj = DB.get(cardId);
+      if (cardObj) {
+        var pSlot = DR.state.pickingSlot;
+        DR.pickCard(pSlot.type, pSlot.id, cardObj);
+        showToast(cardObj.name + " SELECTED");
+      }
+      openScreen("draft");
+      return;
+    }
+
+    var dSim = ev.target.closest("[data-draft-sim]");
+    if (dSim && DR) {
+      var res = DR.simulateMatch("Global All-Stars", 88);
+      showToast(res.win ? "VICTORY! " + res.userGoals + "-" + res.oppGoals + " · +" + EC.short(res.coins) + " COINS"
+                        : "MATCH ENDED " + res.userGoals + "-" + res.oppGoals + " · +" + EC.short(res.coins) + " COINS");
+      DR.state.active = false;
+      openScreen("draft");
+      return;
+    }
+
+    var dReset = ev.target.closest("[data-draft-reset]");
+    if (dReset && DR) {
+      DR.state.active = false;
+      openScreen("draft");
+      return;
+    }
+
+    var bCard = ev.target.closest("[data-buy-card]");
+    if (bCard && EC && DB) {
+      var parts = bCard.getAttribute("data-buy-card").split(":");
+      var cId = parts[0];
+      var costCoins = parseInt(parts[1], 10) || 100000;
+      var cardObj = DB.get(cId);
+
+      if (cardObj) {
+        if (EC.canPay({ coins: costCoins })) {
+          EC.pay({ coins: costCoins });
+          EC.add(cardObj);
+          showToast("PURCHASED " + cardObj.name + "!");
+          openScreen("market");
+        } else {
+          showToast("NOT ENOUGH COINS (" + EC.short(costCoins) + " NEEDED)");
+        }
+      }
+      return;
+    }
+
     var row = ev.target.closest("[data-open]");
     if (row) { openCard(row.getAttribute("data-open")); return; }
 
